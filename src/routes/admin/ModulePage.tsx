@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { Search } from 'lucide-react'
 
 import { fetchAudit, type ActivityItem } from '@/services/adminAuth'
 import { fetchMembers, type MemberRow } from '@/services/memberAuth'
@@ -52,7 +54,9 @@ export function ModulePage({ kind }: { kind: ModuleKind }) {
 }
 
 function MembersModule() {
+  const navigate = useNavigate()
   const [members, setMembers] = useState<MemberRow[] | null>(null)
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     void fetchMembers()
@@ -60,8 +64,25 @@ function MembersModule() {
       .catch(() => setMembers([]))
   }, [])
 
+  const needle = query.trim().toLowerCase()
+  const visible = (members ?? []).filter((member) => {
+    if (!needle) return true
+    return [member.name, member.email, member.region, member.plan, member.mobile, member.school_name]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(needle))
+  })
+
   return (
     <Frame title="Members" text="School accounts that registered to use GabayMo.">
+      <label className="mb-4 flex h-11 w-full max-w-sm items-center gap-2 rounded-full border border-[#eceae6] bg-white px-4 text-sm">
+        <Search size={16} className="text-[#8a8a8a]" />
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search name, email, or region"
+          className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#8a8a8a]"
+        />
+      </label>
       <div className="overflow-hidden rounded-3xl border border-[#eceae6] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-sm">
@@ -81,15 +102,24 @@ function MembersModule() {
                     Loading members…
                   </td>
                 </tr>
-              ) : members.length === 0 ? (
+              ) : visible.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-5 py-16 text-center text-[#6d6d6d]">
-                    No members have joined yet.
+                    {members.length === 0 ? 'No members have joined yet.' : 'No members match that search.'}
                   </td>
                 </tr>
               ) : (
-                members.map((member) => (
-                  <tr key={member.id} className="border-t border-[#f3f1ed]">
+                visible.map((member) => (
+                  <tr
+                    key={member.id}
+                    className="cursor-pointer border-t border-[#f3f1ed] hover:bg-[#fafaf8]"
+                    onClick={() =>
+                      void navigate({
+                        to: '/admin/members/$memberId',
+                        params: { memberId: String(member.id) },
+                      })
+                    }
+                  >
                     <td className="px-5 py-4 font-medium">{member.name}</td>
                     <td className="px-5 py-4">{member.region}</td>
                     <td className="px-5 py-4 text-[#5c6b63]">{member.email}</td>

@@ -23,6 +23,7 @@ export type MemberProfile = {
 
 export type MemberRow = MemberProfile & {
   id: number
+  school_name?: string | null
   joined_at: string | null
 }
 
@@ -123,9 +124,29 @@ export function memberError(error: unknown) {
   return 'Something went wrong. Try again.'
 }
 
+function adminHeaders() {
+  return { Authorization: `Bearer ${readAdminToken() ?? ''}` }
+}
+
 export async function fetchMembers() {
   const { data } = await api.get<{ members: MemberRow[] }>('/v1/admin/members', {
-    headers: { Authorization: `Bearer ${readAdminToken() ?? ''}` },
+    headers: adminHeaders(),
   })
   return data.members
+}
+
+export async function fetchMember(id: number) {
+  const { data } = await api.get<{ member: MemberRow }>(`/v1/admin/members/${id}`, {
+    headers: adminHeaders(),
+  })
+  return data.member
+}
+
+export async function addMemberTokens(id: number, amount: number) {
+  const { data } = await api.post<{ member: MemberRow }>(
+    `/v1/admin/members/${id}/tokens`,
+    { amount },
+    { headers: adminHeaders() },
+  )
+  return data.member
 }

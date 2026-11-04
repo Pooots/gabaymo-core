@@ -34,6 +34,7 @@ import {
   PartnerProfile,
 } from './routes/partner/PartnerPages'
 import { PartnerAccepted, PartnerThread, PartnerTickets } from './routes/partner/PartnerTicketDesk'
+import { MemberDetailPage } from './routes/admin/MemberDetailPage'
 import { PartnersPage } from './routes/admin/PartnersPage'
 import './styles.css'
 
@@ -183,6 +184,11 @@ const routeTree = rootRoute.addChildren([
   adminLayoutRoute.addChildren([
     overviewRoute,
     moduleRoute('members', 'members'),
+    createRoute({
+      getParentRoute: () => adminLayoutRoute,
+      path: 'members/$memberId',
+      component: MemberDetailPage,
+    }),
     createRoute({
       getParentRoute: () => adminLayoutRoute,
       path: 'roles',
