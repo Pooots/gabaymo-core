@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import { api } from '@/lib/api'
-import { readAdminToken } from '@/services/adminAuth'
 
 export const knowledgeCategories = [
   'MOOE and Liquidation',
@@ -54,14 +53,9 @@ export type KnowledgeInput = {
   active: boolean
 }
 
-function adminHeaders() {
-  return { Authorization: `Bearer ${readAdminToken() ?? ''}` }
-}
-
 export async function fetchKnowledgeDocuments() {
   const { data } = await api.get<{ documents: KnowledgeDocument[] }>(
     '/v1/admin/knowledge-documents',
-    { headers: adminHeaders() },
   )
   return data.documents
 }
@@ -74,23 +68,22 @@ export async function reviewKnowledgeDocument(
   const { data } = await api.put<{ document: KnowledgeDocument }>(
     `/v1/admin/knowledge-documents/${id}/review`,
     { source_status: sourceStatus, source_note: sourceNote || null },
-    { headers: adminHeaders() },
   )
   return data.document
 }
 
-export async function saveKnowledgeDocument(id: number | null, input: KnowledgeInput) {
-  const config = { headers: adminHeaders() }
+export async function saveKnowledgeDocument(
+  id: number | null,
+  input: KnowledgeInput,
+) {
   const response = id
     ? await api.put<{ document: KnowledgeDocument }>(
         `/v1/admin/knowledge-documents/${id}`,
         input,
-        config,
       )
     : await api.post<{ document: KnowledgeDocument }>(
         '/v1/admin/knowledge-documents',
         input,
-        config,
       )
   return response.data.document
 }
@@ -98,9 +91,10 @@ export async function saveKnowledgeDocument(id: number | null, input: KnowledgeI
 export function knowledgeError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      | { message?: string; errors?: Record<string, string[]> }
-      | undefined
-    const first = data?.errors ? Object.values(data.errors).flat()[0] : undefined
+      { message?: string; errors?: Record<string, string[]> } | undefined
+    const first = data?.errors
+      ? Object.values(data.errors).flat()[0]
+      : undefined
     return first || data?.message || 'Could not save this document.'
   }
   return 'Could not save this document.'

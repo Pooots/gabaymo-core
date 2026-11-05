@@ -24,6 +24,11 @@ export default defineConfig(({ mode }) => {
       target: apiOrigin,
       changeOrigin: true,
     },
+    // Sanctum's XSRF-TOKEN cookie endpoint.
+    '/sanctum': {
+      target: apiOrigin,
+      changeOrigin: true,
+    },
   }
 
   return {

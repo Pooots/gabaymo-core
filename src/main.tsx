@@ -24,8 +24,13 @@ import { AccountPage } from './routes/account/AccountPage'
 import { UserLoginPage } from './routes/account/UserLoginPage'
 import { UserRegisterPage } from './routes/account/UserRegisterPage'
 import { HomePage } from './routes/HomePage'
-import { readAdminToken } from './services/adminAuth'
-import { memberHome, readMember, readMemberToken } from './services/memberAuth'
+import { onUnauthorized } from './lib/api'
+import { clearAdminSession, loadAdminSession } from './services/adminAuth'
+import {
+  clearMemberSession,
+  loadMemberSession,
+  memberHome,
+} from './services/memberAuth'
 import { PartnerLayout } from './routes/partner/PartnerLayout'
 import {
   PartnerDashboard,
@@ -33,7 +38,11 @@ import {
   PartnerLibrary,
   PartnerProfile,
 } from './routes/partner/PartnerPages'
-import { PartnerAccepted, PartnerThread, PartnerTickets } from './routes/partner/PartnerTicketDesk'
+import {
+  PartnerAccepted,
+  PartnerThread,
+  PartnerTickets,
+} from './routes/partner/PartnerTicketDesk'
 import { MemberDetailPage } from './routes/admin/MemberDetailPage'
 import { PartnersPage } from './routes/admin/PartnersPage'
 import './styles.css'
@@ -51,8 +60,10 @@ const indexRoute = createRoute({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  beforeLoad: () => {
-    if (readMemberToken()) throw redirect({ to: memberHome() })
+  beforeLoad: async () => {
+    // One login for customers and partners: send each to their own portal.
+    const user = await loadMemberSession()
+    if (user) throw redirect({ to: memberHome(user) })
   },
   component: UserLoginPage,
 })
@@ -60,8 +71,9 @@ const loginRoute = createRoute({
 const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
-  beforeLoad: () => {
-    if (readMemberToken()) throw redirect({ to: memberHome() })
+  beforeLoad: async () => {
+    const user = await loadMemberSession()
+    if (user) throw redirect({ to: memberHome(user) })
   },
   component: UserRegisterPage,
 })
@@ -69,9 +81,10 @@ const registerRoute = createRoute({
 const partnerLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/partner',
-  beforeLoad: () => {
-    if (!readMemberToken()) throw redirect({ to: '/login' })
-    if (readMember()?.type !== 'partners') throw redirect({ to: '/account' })
+  beforeLoad: async () => {
+    const user = await loadMemberSession()
+    if (!user) throw redirect({ to: '/login' })
+    if (memberHome(user) !== '/partner') throw redirect({ to: '/account' })
   },
   component: PartnerLayout,
 })
@@ -121,9 +134,10 @@ const partnerProfileRoute = createRoute({
 const accountRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/account',
-  beforeLoad: () => {
-    if (!readMemberToken()) throw redirect({ to: '/login' })
-    if (readMember()?.type === 'partners') throw redirect({ to: '/partner' })
+  beforeLoad: async () => {
+    const user = await loadMemberSession()
+    if (!user) throw redirect({ to: '/login' })
+    if (memberHome(user) !== '/account') throw redirect({ to: '/partner' })
   },
   component: AccountPage,
 })
@@ -131,8 +145,8 @@ const accountRoute = createRoute({
 const adminLoginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin/login',
-  beforeLoad: () => {
-    if (readAdminToken()) {
+  beforeLoad: async () => {
+    if (await loadAdminSession()) {
       throw redirect({ to: '/admin' })
     }
   },
@@ -142,8 +156,8 @@ const adminLoginRoute = createRoute({
 const adminLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
-  beforeLoad: () => {
-    if (!readAdminToken()) {
+  beforeLoad: async () => {
+    if (!(await loadAdminSession())) {
       throw redirect({ to: '/admin/login' })
     }
   },
@@ -253,6 +267,22 @@ const routeTree = rootRoute.addChildren([
 ])
 
 const router = createRouter({ routeTree })
+
+// Session expired or was signed out elsewhere: drop the cached profile and
+// send the user to the right sign-in page.
+onUnauthorized((url) => {
+  const path = window.location.pathname
+  if (url.startsWith('/v1/admin/')) {
+    clearAdminSession()
+    if (path.startsWith('/admin') && path !== '/admin/login')
+      void router.navigate({ to: '/admin/login' })
+    return
+  }
+  if (url === '/v1/session') return
+  clearMemberSession()
+  if (path.startsWith('/account') || path.startsWith('/partner'))
+    void router.navigate({ to: '/login' })
+})
 
 declare module '@tanstack/react-router' {
   interface Register {

@@ -1,8 +1,7 @@
 import axios from 'axios'
 
 import { api } from '@/lib/api'
-import { readAdminToken } from '@/services/adminAuth'
-import { clearMemberSession, readMemberToken } from '@/services/memberAuth'
+import { clearMemberSession } from '@/services/memberAuth'
 
 export type PartnerRow = {
   id: number
@@ -22,7 +21,7 @@ export type PartnerProfile = {
   email: string
   mobile: string | null
   specialty: string | null
-  type: string | null
+  account_type: 'partner' | null
   response_hours: number
   partner_status: string
 }
@@ -39,18 +38,10 @@ export type PartnerDocument = {
   content: string
 }
 
-function partnerHeaders() {
-  return { Authorization: `Bearer ${readMemberToken() ?? ''}` }
-}
-
-function adminHeaders() {
-  return { Authorization: `Bearer ${readAdminToken() ?? ''}` }
-}
-
 export async function fetchPartners() {
-  const { data } = await api.get<{ partners: PartnerRow[] }>('/v1/admin/partners', {
-    headers: adminHeaders(),
-  })
+  const { data } = await api.get<{ partners: PartnerRow[] }>(
+    '/v1/admin/partners',
+  )
   return data.partners
 }
 
@@ -64,9 +55,10 @@ export async function createPartner(input: {
   response_hours: number
   partner_status: string
 }) {
-  const { data } = await api.post<{ partner: PartnerRow }>('/v1/admin/partners', input, {
-    headers: adminHeaders(),
-  })
+  const { data } = await api.post<{ partner: PartnerRow }>(
+    '/v1/admin/partners',
+    input,
+  )
   return data.partner
 }
 
@@ -79,16 +71,13 @@ export type PartnerDashboardData = {
 }
 
 export async function fetchPartnerDashboard() {
-  const { data } = await api.get<PartnerDashboardData>('/v1/partner/dashboard', {
-    headers: partnerHeaders(),
-  })
+  const { data } = await api.get<PartnerDashboardData>('/v1/partner/dashboard')
   return data
 }
 
 export async function fetchPartnerInstructions() {
   const { data } = await api.get<{ instructions: PartnerInstruction[] }>(
     '/v1/partner/instructions',
-    { headers: partnerHeaders() },
   )
   return data.instructions
 }
@@ -115,16 +104,16 @@ export type TicketChatMessage = {
 }
 
 export async function fetchPartnerTickets() {
-  const { data } = await api.get<{ tickets: PartnerTicket[] }>('/v1/partner/tickets', {
-    headers: partnerHeaders(),
-  })
+  const { data } = await api.get<{ tickets: PartnerTicket[] }>(
+    '/v1/partner/tickets',
+  )
   return data.tickets
 }
 
 export async function fetchAcceptedTickets() {
-  const { data } = await api.get<{ tickets: PartnerTicket[] }>('/v1/partner/accepted', {
-    headers: partnerHeaders(),
-  })
+  const { data } = await api.get<{ tickets: PartnerTicket[] }>(
+    '/v1/partner/accepted',
+  )
   return data.tickets
 }
 
@@ -132,16 +121,15 @@ export async function acceptPartnerTicket(id: number) {
   const { data } = await api.post<{ ticket: PartnerTicket }>(
     `/v1/partner/tickets/${id}/accept`,
     {},
-    { headers: partnerHeaders() },
   )
   return data.ticket
 }
 
 export async function fetchPartnerThread(id: number) {
-  const { data } = await api.get<{ ticket: PartnerTicket; messages: TicketChatMessage[] }>(
-    `/v1/partner/tickets/${id}/messages`,
-    { headers: partnerHeaders() },
-  )
+  const { data } = await api.get<{
+    ticket: PartnerTicket
+    messages: TicketChatMessage[]
+  }>(`/v1/partner/tickets/${id}/messages`)
   return data
 }
 
@@ -149,15 +137,14 @@ export async function sendPartnerMessage(id: number, body: string) {
   const { data } = await api.post<{ message: TicketChatMessage }>(
     `/v1/partner/tickets/${id}/messages`,
     { body },
-    { headers: partnerHeaders() },
   )
   return data.message
 }
 
 export async function fetchPartnerKnowledge() {
-  const { data } = await api.get<{ documents: PartnerDocument[] }>('/v1/partner/knowledge', {
-    headers: partnerHeaders(),
-  })
+  const { data } = await api.get<{ documents: PartnerDocument[] }>(
+    '/v1/partner/knowledge',
+  )
   return data.documents
 }
 
@@ -168,18 +155,16 @@ export async function updatePartnerProfile(input: {
   specialty: string
   response_hours: number
 }) {
-  const { data } = await api.put<{ partner: PartnerProfile }>('/v1/partner/profile', input, {
-    headers: partnerHeaders(),
-  })
+  const { data } = await api.put<{ partner: PartnerProfile }>(
+    '/v1/partner/profile',
+    input,
+  )
   return data.partner
 }
 
 export async function logoutPartner() {
-  const token = readMemberToken()
   try {
-    if (token) {
-      await api.post('/v1/partner/logout', {}, { headers: partnerHeaders() })
-    }
+    await api.post('/v1/partner/logout')
   } finally {
     clearMemberSession()
   }
@@ -188,9 +173,10 @@ export async function logoutPartner() {
 export function partnerError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      | { message?: string; errors?: Record<string, string[]> }
-      | undefined
-    const first = data?.errors ? Object.values(data.errors).flat()[0] : undefined
+      { message?: string; errors?: Record<string, string[]> } | undefined
+    const first = data?.errors
+      ? Object.values(data.errors).flat()[0]
+      : undefined
     return first || data?.message || 'Something went wrong. Try again.'
   }
   return 'Something went wrong. Try again.'

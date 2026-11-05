@@ -1,5 +1,4 @@
 import { api } from '@/lib/api'
-import { readMemberToken } from '@/services/memberAuth'
 
 export type MemberTicket = {
   id: number
@@ -19,20 +18,16 @@ export type TicketChatMessage = {
   sender_role: string
 }
 
-function headers() {
-  return { Authorization: `Bearer ${readMemberToken() ?? ''}` }
-}
-
 export async function fetchMemberTickets() {
-  const { data } = await api.get<{ tickets: MemberTicket[] }>('/v1/tickets', { headers: headers() })
+  const { data } = await api.get<{ tickets: MemberTicket[] }>('/v1/tickets')
   return data.tickets
 }
 
 export async function fetchMemberThread(id: number) {
-  const { data } = await api.get<{ ticket: MemberTicket; messages: TicketChatMessage[] }>(
-    `/v1/tickets/${id}`,
-    { headers: headers() },
-  )
+  const { data } = await api.get<{
+    ticket: MemberTicket
+    messages: TicketChatMessage[]
+  }>(`/v1/tickets/${id}`)
   return data
 }
 
@@ -40,14 +35,17 @@ export async function sendMemberMessage(id: number, body: string) {
   const { data } = await api.post<{ message: TicketChatMessage }>(
     `/v1/tickets/${id}/messages`,
     { body },
-    { headers: headers() },
   )
   return data.message
 }
 
-export async function createMemberTicket(input: { subject: string; body: string }) {
-  const { data } = await api.post<{ ticket: MemberTicket }>('/v1/tickets', input, {
-    headers: headers(),
-  })
+export async function createMemberTicket(input: {
+  subject: string
+  body: string
+}) {
+  const { data } = await api.post<{ ticket: MemberTicket }>(
+    '/v1/tickets',
+    input,
+  )
   return data.ticket
 }

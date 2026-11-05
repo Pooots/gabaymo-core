@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
 
-import { api } from '@/lib/api'
 import {
+  loadAdminSession,
   logoutAdmin,
-  readAdminToken,
   readAdminUser,
-  writeAdminUser,
   type AdminUser,
 } from '@/services/adminAuth'
 
@@ -20,24 +23,18 @@ export function AdminLayout() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const token = readAdminToken()
-    if (!token) return
-    void api
-      .get<{ user: AdminUser }>('/v1/admin/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => {
-        writeAdminUser(data.user)
-        setAdmin(data.user)
-      })
-      .catch(() => undefined)
+    void loadAdminSession().then((user) => {
+      if (user) setAdmin(user)
+    })
   }, [])
 
   useEffect(() => {
     const permissions = admin?.permissions
     if (!permissions) return
     const currentItem = adminModules.find((item) =>
-      item.exact ? current === item.to : current === item.to || current.startsWith(`${item.to}/`),
+      item.exact
+        ? current === item.to
+        : current === item.to || current.startsWith(`${item.to}/`),
     )
     if (!currentItem || permissions.includes(currentItem.key)) return
     const next = adminModules.find((item) => permissions.includes(item.key))
@@ -79,7 +76,9 @@ export function AdminLayout() {
         />
       ) : null}
 
-      <div className={`lg:pl-64 ${isOverview ? 'xl:h-dvh xl:overflow-hidden' : ''}`}>
+      <div
+        className={`lg:pl-64 ${isOverview ? 'xl:h-dvh xl:overflow-hidden' : ''}`}
+      >
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-[#eceae6] bg-[#f6f5f2]/90 px-4 backdrop-blur sm:px-6">
           <div className="flex items-center gap-3">
             <button
