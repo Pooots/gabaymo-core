@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, type PointerEvent, type ReactNode } from 'react'
+import {   useLayoutEffect, useRef } from 'react'
+import type {PointerEvent, ReactNode} from 'react';
 
 export function MessageScroller({ watch, children }: { watch: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)

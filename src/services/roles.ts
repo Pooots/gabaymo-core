@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { api } from '@/lib/api'
+import { adminApi } from '@/lib/api'
 
 export type PermissionModule = {
   group: string
@@ -12,6 +12,10 @@ export type RoleAccount = {
   id: number
   name: string
   email: string
+  /** Section D: invited (has not set a password yet) | active; section E adds suspended. */
+  status?: 'invited' | 'active' | 'suspended'
+  invitation_expires_at?: string | null
+  suspended_at?: string | null
 }
 
 export type StaffRole = {
@@ -20,50 +24,39 @@ export type StaffRole = {
   slug: string
   description: string | null
   is_system: boolean
-  permissions: string[]
-  accounts: RoleAccount[]
+  permissions: Array<string>
+  accounts: Array<RoleAccount>
 }
 
 export type RoleInput = {
   name: string
   description: string | null
-  permissions: string[]
+  permissions: Array<string>
 }
 
 export async function fetchRoles() {
-  const { data } = await api.get<{
-    modules: PermissionModule[]
-    roles: StaffRole[]
+  const { data } = await adminApi.get<{
+    modules: Array<PermissionModule>
+    roles: Array<StaffRole>
   }>('/v1/admin/roles')
   return data
 }
 
 export async function saveRole(id: number | null, input: RoleInput) {
   const response = id
-    ? await api.put<{ role: StaffRole }>(`/v1/admin/roles/${id}`, input)
-    : await api.post<{ role: StaffRole }>(`/v1/admin/roles`, input)
+    ? await adminApi.put<{ role: StaffRole }>(`/v1/admin/roles/${id}`, input)
+    : await adminApi.post<{ role: StaffRole }>(`/v1/admin/roles`, input)
   return response.data.role
 }
 
 export async function deleteRole(id: number) {
-  await api.delete(`/v1/admin/roles/${id}`)
-}
-
-export async function addRoleAccount(
-  id: number,
-  account: { name: string; email: string; password: string },
-) {
-  const { data } = await api.post<{ role: StaffRole }>(
-    `/v1/admin/roles/${id}/accounts`,
-    account,
-  )
-  return data.role
+  await adminApi.delete(`/v1/admin/roles/${id}`)
 }
 
 export function roleError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      { message?: string; errors?: Record<string, string[]> } | undefined
+      { message?: string; errors?: Record<string, Array<string>> } | undefined
     const first = data?.errors
       ? Object.values(data.errors).flat()[0]
       : undefined

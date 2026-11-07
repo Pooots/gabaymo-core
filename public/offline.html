@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0e6b3e" />
+    <title>GabayMo · Offline</title>
+    <style>
+      :root { color-scheme: light dark; --ink: #16211c; --muted: #5c6b63; --paper: #f4f7f4; --card: #ffffff; --line: #e6eeea; --brand: #0e6b3e; }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink: #e3ebe6; --muted: #9fb0a7; --paper: #0f1512; --card: #17201b; --line: #26332c; --brand: #3fb27a; }
+      }
+      body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 16px; box-sizing: border-box; background: var(--paper); color: var(--ink); font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      main { max-width: 420px; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; text-align: center; }
+      img { height: 40px; width: auto; }
+      h1 { font-size: 1.25rem; margin: 18px 0 8px; }
+      p { color: var(--muted); line-height: 1.55; margin: 0 0 12px; font-size: 0.95rem; }
+      button { margin-top: 8px; border: 0; border-radius: 999px; padding: 0.7rem 1.2rem; background: var(--brand); color: #fff; font-weight: 600; font-size: 0.92rem; cursor: pointer; }
+      button:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/gabaymo-logo.png" alt="GabayMo" />
+      <h1>You are offline</h1>
+      <p>GabayMo needs an internet connection for this page. Your last-opened answers are still available in your account.</p>
+      <p lang="fil">Wala kang internet ngayon. Mabubuksan mo pa rin ang mga huling sagot na binasa mo sa iyong account.</p>
+      <button type="button" onclick="location.reload()">Try again · Subukan muli</button>
+    </main>
+  </body>
+</html>

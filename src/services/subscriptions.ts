@@ -1,8 +1,11 @@
 import axios from 'axios'
 
-import { api } from '@/lib/api'
+import { adminApi, api } from '@/lib/api'
 
 export type SubscriptionCadence = 'forever' | 'month' | 'year'
+
+/** month: refreshes monthly (yearly plans too) · once: never refreshes (trial). */
+export type AllowancePeriod = 'month' | 'once'
 
 export type SubscriptionPlan = {
   id: number
@@ -11,9 +14,13 @@ export type SubscriptionPlan = {
   price_label: string
   cadence: SubscriptionCadence
   cadence_label: string
-  tokens: number
+  /** Weighted tokens per usage period. */
+  token_allowance: number
+  allowance_period: AllowancePeriod
+  estimated_questions: number
+  allowance_label: string
   summary: string
-  specs: string[]
+  specs: Array<string>
   featured: boolean
   active: boolean
   sort_order: number
@@ -23,23 +30,26 @@ export type SubscriptionInput = {
   name: string
   price: number
   cadence: SubscriptionCadence
-  tokens: number
+  token_allowance: number
+  allowance_period: AllowancePeriod
   summary: string
-  specs: string[]
+  specs: Array<string>
   featured: boolean
   active: boolean
   sort_order: number
 }
 
 export async function fetchSubscriptions() {
-  const { data } = await api.get<{ plans: SubscriptionPlan[] }>(
+  const { data } = await adminApi.get<{ plans: Array<SubscriptionPlan> }>(
     '/v1/admin/subscriptions',
   )
   return data.plans
 }
 
 export async function fetchPublishedPlans() {
-  const { data } = await api.get<{ plans: SubscriptionPlan[] }>('/v1/plans')
+  const { data } = await api.get<{ plans: Array<SubscriptionPlan> }>(
+    '/v1/plans',
+  )
   return data.plans
 }
 
@@ -48,11 +58,11 @@ export async function saveSubscription(
   input: SubscriptionInput,
 ) {
   const response = id
-    ? await api.put<{ plan: SubscriptionPlan }>(
+    ? await adminApi.put<{ plan: SubscriptionPlan }>(
         `/v1/admin/subscriptions/${id}`,
         input,
       )
-    : await api.post<{ plan: SubscriptionPlan }>(
+    : await adminApi.post<{ plan: SubscriptionPlan }>(
         '/v1/admin/subscriptions',
         input,
       )
@@ -62,7 +72,7 @@ export async function saveSubscription(
 export function subscriptionError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      { message?: string; errors?: Record<string, string[]> } | undefined
+      { message?: string; errors?: Record<string, Array<string>> } | undefined
     const first = data?.errors
       ? Object.values(data.errors).flat()[0]
       : undefined

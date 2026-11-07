@@ -1,4 +1,5 @@
-import axios, { type InternalAxiosRequestConfig } from 'axios'
+import axios from 'axios'
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 
 /**
  * Resolve API base URL for local (relative / Vite proxy) and hosted frontends.
@@ -25,25 +26,22 @@ function resolveApiBaseUrl(raw: string | undefined): string {
   }
 }
 
-export const API_BASE_URL = resolveApiBaseUrl(
-  import.meta.env.VITE_API_BASE_URL as string | undefined,
-)
+export const API_BASE_URL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL)
 
 /**
- * Auth is a Laravel Sanctum cookie session (httpOnly, set by the API).
- * No token is ever stored in JavaScript: the browser sends the session cookie,
- * and axios copies the XSRF-TOKEN cookie into the X-XSRF-TOKEN header.
+ * Which signed-in session a request belongs to. Members and partners share
+ * the customer session cookie (`member`); staff use a separate one (`admin`).
+ * Each area has its own client, so a 401 is routed to that area's handler
+ * explicitly instead of guessing from the URL.
  */
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  // Also send X-XSRF-TOKEN cross-origin (api.gabaymo.com from *.gabaymo.com).
-  withXSRFToken: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-})
+export type ApiArea = 'member' | 'admin'
+
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    /** Session probes handle their own 401 (it just means "signed out"). */
+    skipAuthRedirect?: boolean
+  }
+}
 
 /** `/api` → `/sanctum/csrf-cookie`, `https://api.x.com/api` → `https://api.x.com/sanctum/csrf-cookie` */
 const CSRF_COOKIE_URL = `${API_BASE_URL.replace(/\/api$/, '')}/sanctum/csrf-cookie`
@@ -70,37 +68,74 @@ export function ensureCsrfCookie(force = false): Promise<void> {
 
 const UNSAFE_METHODS = new Set(['post', 'put', 'patch', 'delete'])
 
-api.interceptors.request.use(async (config) => {
-  if (UNSAFE_METHODS.has((config.method ?? 'get').toLowerCase())) {
-    await ensureCsrfCookie()
-  }
-  return config
-})
-
 type RetriableConfig = InternalAxiosRequestConfig & { _csrfRetried?: boolean }
 
-let unauthorizedHandler: ((url: string) => void) | null = null
+type UnauthorizedHandler = (url: string) => void
 
-/** Called when any API request returns 401 (session expired or signed out elsewhere). */
-export function onUnauthorized(handler: (url: string) => void) {
-  unauthorizedHandler = handler
+const unauthorizedHandlers = new Map<ApiArea, UnauthorizedHandler>()
+
+/**
+ * Called when a request of `area` returns 401 (session expired or signed out
+ * elsewhere). Returns a function that removes the handler.
+ */
+export function onUnauthorized(area: ApiArea, handler: UnauthorizedHandler) {
+  unauthorizedHandlers.set(area, handler)
+  return () => {
+    if (unauthorizedHandlers.get(area) === handler)
+      unauthorizedHandlers.delete(area)
+  }
 }
 
-api.interceptors.response.use(undefined, async (error: unknown) => {
-  if (!axios.isAxiosError(error) || !error.config) throw error
-  const config = error.config as RetriableConfig
+/**
+ * Auth is a Laravel Sanctum cookie session (httpOnly, set by the API).
+ * No token is ever stored in JavaScript: the browser sends the session cookie,
+ * and axios copies the XSRF-TOKEN cookie into the X-XSRF-TOKEN header.
+ */
+export function createApiClient(area: ApiArea): AxiosInstance {
+  const client = axios.create({
+    baseURL: API_BASE_URL,
+    withCredentials: true,
+    // Also send X-XSRF-TOKEN cross-origin (api.gabaymo.com from *.gabaymo.com).
+    withXSRFToken: true,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  })
 
-  // 419 = CSRF token expired (e.g. the session timed out). Refresh it and retry once.
-  if (error.response?.status === 419 && !config._csrfRetried) {
-    config._csrfRetried = true
-    await ensureCsrfCookie(true)
-    return api.request(config)
-  }
+  client.interceptors.request.use(async (config) => {
+    if (UNSAFE_METHODS.has((config.method ?? 'get').toLowerCase())) {
+      await ensureCsrfCookie()
+    }
+    return config
+  })
 
-  if (error.response?.status === 401) unauthorizedHandler?.(config.url ?? '')
+  client.interceptors.response.use(undefined, async (error: unknown) => {
+    if (!axios.isAxiosError(error) || !error.config) throw error
+    const config = error.config as RetriableConfig
 
-  throw error
-})
+    // 419 = CSRF token expired (e.g. the session timed out). Refresh it and retry once.
+    if (error.response?.status === 419 && !config._csrfRetried) {
+      config._csrfRetried = true
+      await ensureCsrfCookie(true)
+      return client.request(config)
+    }
+
+    if (error.response?.status === 401 && !config.skipAuthRedirect) {
+      unauthorizedHandlers.get(area)?.(config.url ?? '')
+    }
+
+    throw error
+  })
+
+  return client
+}
+
+/** Customer + partner session (`/v1/...`, `/v1/partner/...`). */
+export const api = createApiClient('member')
+
+/** Staff session (`/v1/admin/...`). */
+export const adminApi = createApiClient('admin')
 
 export type ApiInfo = {
   ok: boolean

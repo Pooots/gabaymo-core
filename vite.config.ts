@@ -1,10 +1,10 @@
+/// <reference types="vitest/config" />
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-// @ts-ignore - Node.js built-in modules are available in Vite config context
-import { fileURLToPath } from 'url'
-// @ts-ignore - Node.js built-in modules are available in Vite config context
-import path from 'path'
+import { VitePWA } from 'vite-plugin-pwa'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -35,6 +35,44 @@ export default defineConfig(({ mode }) => {
     plugins: [
       viteReact(),
       tailwindcss(),
+      VitePWA({
+        // Custom worker (src/sw/sw.ts): precache the app shell + static
+        // assets, never cache API responses, offline.html for areas that
+        // need the network. Members keep their last-opened answers via
+        // src/lib/offlineAnswers.ts (localStorage), not the service worker.
+        strategies: 'injectManifest',
+        srcDir: 'src/sw',
+        filename: 'sw.ts',
+        registerType: 'autoUpdate',
+        injectRegister: false,
+        injectManifest: {
+          globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+        },
+        includeAssets: ['gabaymo-logo.png', 'offline.html'],
+        manifest: {
+          name: 'GabayMo',
+          short_name: 'GabayMo',
+          description:
+            'Cited DepEd policy answers for Philippine public school teachers.',
+          lang: 'en-PH',
+          start_url: '/account',
+          scope: '/',
+          display: 'standalone',
+          background_color: '#f4f7f4',
+          theme_color: '#0e6b3e',
+          icons: [
+            { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+            {
+              src: '/icons/icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
+          ],
+        },
+        devOptions: { enabled: false },
+      }),
       {
         name: 'html-transform',
         transformIndexHtml(html: string) {
@@ -59,6 +97,13 @@ export default defineConfig(({ mode }) => {
     preview: {
       port: 3000,
       proxy,
+    },
+    test: {
+      environment: 'jsdom',
+      globals: false,
+      setupFiles: ['./src/test/setup.ts'],
+      include: ['src/**/*.test.{ts,tsx}'],
+      css: false,
     },
   }
 })

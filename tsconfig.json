@@ -1,5 +1,6 @@
 {
   "include": ["**/*.ts", "**/*.tsx", "eslint.config.js", "prettier.config.js", "vite.config.ts"],
+  "exclude": ["node_modules", "dist", "dev-dist", "src/sw"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -12,6 +13,7 @@
     "noEmit": true,
     "skipLibCheck": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,

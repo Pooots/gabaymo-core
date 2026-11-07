@@ -1,14 +1,21 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import {   useState } from 'react'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { ChevronDown, Eye, EyeOff, LoaderCircle } from 'lucide-react'
 
-import { PHILIPPINE_REGIONS } from '@/data/philippineRegions'
-import { memberError, registerMember } from '@/services/memberAuth'
-
 import { AccountShell } from './AccountShell'
+import type {FormEvent, ReactNode} from 'react';
+import { PHILIPPINE_REGIONS } from '@/data/philippineRegions'
+import { useI18n } from '@/i18n'
+import { apiErrorMessage } from '@/lib/errors'
+import { registerMember } from '@/services/memberAuth'
+
 
 export function UserRegisterPage() {
+  const { t } = useI18n()
   const navigate = useNavigate()
+  const search = useSearch({ strict: false })
+  const [referral, setReferral] = useState(() => ('ref' in search && typeof search.ref === 'string' ? search.ref.toUpperCase() : ''))
+  const [acceptTerms, setAcceptTerms] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [mobile, setMobile] = useState('')
@@ -24,7 +31,11 @@ export function UserRegisterPage() {
     event.preventDefault()
     setError('')
     if (password !== confirm) {
-      setError('The passwords do not match.')
+      setError(t('auth.passwordMismatch'))
+      return
+    }
+    if (!acceptTerms) {
+      setError(t('auth.termsRequired'))
       return
     }
     setPending(true)
@@ -37,10 +48,12 @@ export function UserRegisterPage() {
         email: email.trim(),
         password,
         password_confirmation: confirm,
+        accept_terms: true,
+        ...(referral.trim() ? { referral_code: referral.trim() } : {}),
       })
       await navigate({ to: '/account' })
     } catch (caught) {
-      setError(memberError(caught))
+      setError(apiErrorMessage(caught, t('auth.registerError')))
     } finally {
       setPending(false)
     }
@@ -49,15 +62,15 @@ export function UserRegisterPage() {
   return (
     <AccountShell
       fit
-      eyebrow="GET STARTED"
-      title="Create your account"
-      text="Register the account that will ask questions and keep the cited answers."
+      eyebrow={t('auth.registerEyebrow')}
+      title={t('auth.registerTitle')}
+      text={t('auth.registerText')}
     >
-      <p className="mt-2 text-[13px] leading-snug text-[#66756d]">
-        A new account starts on the Free Trial. One question uses one token.
+      <p className="mt-2 text-[13px] leading-snug text-moss-571">
+        {t('auth.registerHint')}
       </p>
-      <form className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2.5" onSubmit={(event) => void onSubmit(event)}>
-        <Field label="First name">
+      <form className="mt-4 grid grid-cols-1 gap-x-3 gap-y-2.5 min-[400px]:grid-cols-2" onSubmit={(event) => void onSubmit(event)}>
+        <Field label={t('auth.firstName')}>
           <input
             required
             autoComplete="given-name"
@@ -66,7 +79,7 @@ export function UserRegisterPage() {
             className={inputClass}
           />
         </Field>
-        <Field label="Last name">
+        <Field label={t('auth.lastName')}>
           <input
             required
             autoComplete="family-name"
@@ -75,7 +88,7 @@ export function UserRegisterPage() {
             className={inputClass}
           />
         </Field>
-        <Field label="Mobile number">
+        <Field label={t('auth.mobile')}>
           <input
             required
             inputMode="tel"
@@ -86,7 +99,7 @@ export function UserRegisterPage() {
             className={inputClass}
           />
         </Field>
-        <Field label="Region">
+        <Field label={t('auth.region')}>
           <span className="relative block">
             <select
               required
@@ -95,7 +108,7 @@ export function UserRegisterPage() {
               className={`${inputClass} appearance-none pr-9`}
             >
               <option value="" disabled>
-                Select a region
+                {t('auth.regionPlaceholder')}
               </option>
               {PHILIPPINE_REGIONS.map((name) => (
                 <option key={name} value={name}>
@@ -105,11 +118,12 @@ export function UserRegisterPage() {
             </select>
             <ChevronDown
               size={16}
-              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[#66756d]"
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-moss-571"
             />
           </span>
         </Field>
-        <Field label="Email address" wide>
+        <Field label={t('auth.emailAddress')} wide>
           <input
             required
             type="email"
@@ -119,8 +133,8 @@ export function UserRegisterPage() {
             className={inputClass}
           />
         </Field>
-        <Field label="Password">
-          <span className="flex h-10 items-center rounded-xl border border-[#e6e1d8] bg-white pr-1 focus-within:border-[#0e6b3e] focus-within:ring-4 focus-within:ring-[#0e6b3e]/10">
+        <Field label={t('auth.password')}>
+          <span className="flex h-10 items-center rounded-xl border border-sand-125 bg-surface pr-1 focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
             <input
               required
               minLength={8}
@@ -132,15 +146,16 @@ export function UserRegisterPage() {
             />
             <button
               type="button"
-              className="grid h-8 w-8 shrink-0 place-items-center text-[#66756d]"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="grid h-8 w-8 shrink-0 place-items-center text-moss-571"
+              aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
+              aria-pressed={showPassword}
               onClick={() => setShowPassword((value) => !value)}
             >
-              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              {showPassword ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
             </button>
           </span>
         </Field>
-        <Field label="Confirm password">
+        <Field label={t('auth.confirmPassword')}>
           <input
             required
             minLength={8}
@@ -151,18 +166,51 @@ export function UserRegisterPage() {
             className={inputClass}
           />
         </Field>
+        <Field label={`${t('auth.referralCode')} (${t('common.optional')})`} wide>
+          <input
+            autoComplete="off"
+            maxLength={40}
+            value={referral}
+            onChange={(event) => setReferral(event.target.value.toUpperCase())}
+            aria-describedby="referral-hint"
+            className={inputClass}
+          />
+          <span id="referral-hint" className="mt-1 block text-[11px] text-moss-571">
+            {t('auth.referralHint')}
+          </span>
+        </Field>
+        <div className="col-span-full flex items-start gap-2.5 text-[13px] leading-snug text-moss-833">
+          <input
+            id="accept-terms"
+            type="checkbox"
+            required
+            checked={acceptTerms}
+            onChange={(event) => setAcceptTerms(event.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+          />
+          <label htmlFor="accept-terms">
+            {t('auth.acceptTermsBefore')}{' '}
+            <Link to="/terms" target="_blank" className="font-medium text-brand underline">
+              {t('auth.termsLink')}
+            </Link>{' '}
+            {t('auth.acceptTermsAnd')}{' '}
+            <Link to="/privacy" target="_blank" className="font-medium text-brand underline">
+              {t('auth.privacyLink')}
+            </Link>
+          </label>
+        </div>
         {error ? (
-          <p className="col-span-2 rounded-xl bg-[#fff1f0] px-3 py-2 text-sm text-[#9f2d2d]">{error}</p>
+          <p role="alert" className="col-span-full rounded-xl bg-rust-29 px-3 py-2 text-sm text-rust-600">{error}</p>
         ) : null}
-        <button type="submit" className="btn-primary col-span-2 mt-1 h-11 w-full justify-center" disabled={pending}>
-          {pending ? <LoaderCircle className="animate-spin" size={16} /> : null}
-          {pending ? 'Creating account' : 'Create account'}
+        <button type="submit" className="btn-primary col-span-full mt-1 h-11 w-full justify-center" disabled={pending}>
+          {pending ? <LoaderCircle className="animate-spin" size={16} aria-hidden /> : null}
+          {pending ? t('auth.creatingAccount') : t('auth.createAccount')}
         </button>
       </form>
-      <p className="mt-3 text-sm text-[#5c6b63]">
-        Already registered?{' '}
-        <Link to="/login" className="font-medium text-[#0e6b3e]">
-          Sign in
+      <p className="mt-3 text-sm text-muted">
+        {t('auth.alreadyRegistered')}{' '}
+        <Link to="/login" className="font-medium text-brand">
+          {t('auth.signIn')}
         </Link>
       </p>
     </AccountShell>
@@ -171,12 +219,12 @@ export function UserRegisterPage() {
 
 function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) {
   return (
-    <label className={wide ? 'col-span-2 block' : 'block'}>
-      <span className="mb-1 block text-xs font-medium text-[#24312a]">{label}</span>
+    <label className={wide ? 'col-span-full block' : 'block'}>
+      <span className="mb-1 block text-xs font-medium text-moss-833">{label}</span>
       {children}
     </label>
   )
 }
 
 const inputClass =
-  'h-10 w-full rounded-xl border border-[#e6e1d8] bg-white px-3 text-[14px] outline-none transition focus:border-[#0e6b3e] focus:ring-4 focus:ring-[#0e6b3e]/10'
+  'h-10 w-full rounded-xl border border-sand-125 bg-surface px-3 text-[14px] outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10'

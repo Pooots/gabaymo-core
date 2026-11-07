@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { api } from '@/lib/api'
+import { adminApi } from '@/lib/api'
 
 export const knowledgeCategories = [
   'MOOE and Liquidation',
@@ -54,7 +54,7 @@ export type KnowledgeInput = {
 }
 
 export async function fetchKnowledgeDocuments() {
-  const { data } = await api.get<{ documents: KnowledgeDocument[] }>(
+  const { data } = await adminApi.get<{ documents: Array<KnowledgeDocument> }>(
     '/v1/admin/knowledge-documents',
   )
   return data.documents
@@ -65,7 +65,7 @@ export async function reviewKnowledgeDocument(
   sourceStatus: 'approved' | 'returned',
   sourceNote: string,
 ) {
-  const { data } = await api.put<{ document: KnowledgeDocument }>(
+  const { data } = await adminApi.put<{ document: KnowledgeDocument }>(
     `/v1/admin/knowledge-documents/${id}/review`,
     { source_status: sourceStatus, source_note: sourceNote || null },
   )
@@ -77,11 +77,11 @@ export async function saveKnowledgeDocument(
   input: KnowledgeInput,
 ) {
   const response = id
-    ? await api.put<{ document: KnowledgeDocument }>(
+    ? await adminApi.put<{ document: KnowledgeDocument }>(
         `/v1/admin/knowledge-documents/${id}`,
         input,
       )
-    : await api.post<{ document: KnowledgeDocument }>(
+    : await adminApi.post<{ document: KnowledgeDocument }>(
         '/v1/admin/knowledge-documents',
         input,
       )
@@ -91,7 +91,7 @@ export async function saveKnowledgeDocument(
 export function knowledgeError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      { message?: string; errors?: Record<string, string[]> } | undefined
+      { message?: string; errors?: Record<string, Array<string>> } | undefined
     const first = data?.errors
       ? Object.values(data.errors).flat()[0]
       : undefined

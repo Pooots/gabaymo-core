@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { api } from '@/lib/api'
+import { adminApi } from '@/lib/api'
 
 export type ServiceInstruction = {
   id: number
@@ -18,9 +18,9 @@ export type InstructionInput = {
 }
 
 export async function fetchInstructions() {
-  const { data } = await api.get<{ instructions: ServiceInstruction[] }>(
-    '/v1/admin/service-instructions',
-  )
+  const { data } = await adminApi.get<{
+    instructions: Array<ServiceInstruction>
+  }>('/v1/admin/service-instructions')
   return data.instructions
 }
 
@@ -29,11 +29,11 @@ export async function saveInstruction(
   input: InstructionInput,
 ) {
   const response = id
-    ? await api.put<{ instruction: ServiceInstruction }>(
+    ? await adminApi.put<{ instruction: ServiceInstruction }>(
         `/v1/admin/service-instructions/${id}`,
         input,
       )
-    : await api.post<{ instruction: ServiceInstruction }>(
+    : await adminApi.post<{ instruction: ServiceInstruction }>(
         '/v1/admin/service-instructions',
         input,
       )
@@ -43,7 +43,7 @@ export async function saveInstruction(
 export function instructionError(error: unknown) {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
-      { message?: string; errors?: Record<string, string[]> } | undefined
+      { message?: string; errors?: Record<string, Array<string>> } | undefined
     const first = data?.errors
       ? Object.values(data.errors).flat()[0]
       : undefined

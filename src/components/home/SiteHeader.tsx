@@ -1,21 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
 
+import type { MessageKey } from '@/i18n'
+import { LanguageSwitcher } from '@/components/preferences/LanguageSwitcher'
+import { useDismiss } from '@/hooks/useDismiss'
+import { useI18n } from '@/i18n'
 import { readMember } from '@/services/memberAuth'
 
-const links = [
-  { href: '#home', label: 'Home' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#features', label: 'Features' },
-  { href: '#membership', label: 'Membership' },
-  { href: '#about', label: 'About Us' },
+const links: Array<{ href: string; label: MessageKey }> = [
+  { href: '#home', label: 'home.navHome' },
+  { href: '#how-it-works', label: 'home.navHow' },
+  { href: '#features', label: 'home.navFeatures' },
+  { href: '#membership', label: 'home.navMembership' },
+  { href: '#about', label: 'home.navAbout' },
 ]
 
 export function SiteHeader() {
+  const { t } = useI18n()
   const member = readMember()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  useDismiss(panelRef, open, () => setOpen(false), toggleRef)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -28,98 +36,80 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-40 border-b transition duration-300 ${
         scrolled
-          ? 'border-[#e4ece7] bg-white/90 shadow-[0_10px_30px_-24px_rgba(16,40,28,0.7)] backdrop-blur-md'
-          : 'border-transparent bg-white/75 backdrop-blur-sm'
+          ? 'border-moss-90 bg-surface/90 shadow-[0_10px_30px_-24px_rgba(16,40,28,0.7)] backdrop-blur-md'
+          : 'border-transparent bg-surface/75 backdrop-blur-sm'
       }`}
     >
-      <div className="relative mx-auto flex h-[78px] max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
-        <a href="#home" className="shrink-0" aria-label="GabayMo home">
-          <img
-            src="/gabaymo-logo.png"
-            alt="GabayMo"
-            className="h-12 w-auto sm:h-14"
-          />
+      <div className="relative mx-auto flex h-[78px] max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+        <a href="#home" className="shrink-0" aria-label={t('home.logoLabel')}>
+          <img src="/gabaymo-logo.png" alt="" className="h-12 w-auto sm:h-14" />
         </a>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 text-[14.5px] text-[#3d4a43] lg:flex">
+        <nav aria-label={t('home.navLabel')} className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 text-[14.5px] text-moss-735 lg:flex">
           {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="transition hover:text-[#0e6b3e]"
-            >
-              {link.label}
+            <a key={link.href} href={link.href} className="transition hover:text-brand">
+              {t(link.label)}
             </a>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher compact />
           {member ? (
             <Link to="/account" className="btn-primary">
-              Account
+              {t('home.account')}
             </Link>
           ) : (
             <>
-              <Link to="/login" className="px-3 py-2 text-sm font-medium text-[#243028]">
-                Log in
+              <Link to="/login" className="px-3 py-2 text-sm font-medium text-moss-835">
+                {t('home.logIn')}
               </Link>
               <Link to="/register" className="btn-primary">
-                Get Started
+                {t('home.getStartedCta')}
               </Link>
             </>
           )}
         </div>
 
-        <button
-          type="button"
-          className="grid h-10 w-10 place-items-center rounded-full border border-[#e1eae4] text-[#173026] lg:hidden"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher compact />
+          <button
+            ref={toggleRef}
+            type="button"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-moss-101 text-moss-861"
+            aria-label={open ? t('home.closeMenu') : t('common.openMenu')}
+            aria-expanded={open}
+            aria-controls="site-mobile-menu"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X size={18} aria-hidden /> : <Menu size={18} aria-hidden />}
+          </button>
+        </div>
       </div>
 
       {open ? (
-        <div className="border-t border-[#e7eee9] bg-white px-5 py-4 lg:hidden">
-          <div className="flex flex-col gap-1">
+        <div ref={panelRef} id="site-mobile-menu" className="border-t border-moss-80 bg-surface px-5 py-4 lg:hidden">
+          <nav aria-label={t('home.navLabel')} className="flex flex-col gap-1">
             {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="rounded-xl px-3 py-3 text-[#243028]"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
+              <a key={link.href} href={link.href} className="rounded-xl px-3 py-3 text-moss-835" onClick={() => setOpen(false)}>
+                {t(link.label)}
               </a>
             ))}
             {member ? (
-              <Link
-                to="/account"
-                className="btn-primary mt-2 justify-center"
-                onClick={() => setOpen(false)}
-              >
-                Account
+              <Link to="/account" className="btn-primary mt-2 justify-center" onClick={() => setOpen(false)}>
+                {t('home.account')}
               </Link>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="rounded-xl px-3 py-3 text-[#243028]"
-                  onClick={() => setOpen(false)}
-                >
-                  Log in
+                <Link to="/login" className="rounded-xl px-3 py-3 text-moss-835" onClick={() => setOpen(false)}>
+                  {t('home.logIn')}
                 </Link>
-                <Link
-                  to="/register"
-                  className="btn-primary mt-2 justify-center"
-                  onClick={() => setOpen(false)}
-                >
-                  Get Started
+                <Link to="/register" className="btn-primary mt-2 justify-center" onClick={() => setOpen(false)}>
+                  {t('home.getStartedCta')}
                 </Link>
               </>
             )}
-          </div>
+          </nav>
         </div>
       ) : null}
     </header>

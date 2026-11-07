@@ -1,7 +1,55 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { Plus, X } from 'lucide-react'
+import { useId, useState } from 'react'
+import { MoreHorizontal, Plus } from 'lucide-react'
+import { SearchBox, useAdminFormat } from './modules/shared'
+import type { FormEvent } from 'react'
 
-import { createPartner, fetchPartners, partnerError, type PartnerRow } from '@/services/partners'
+import type { Column, StatusTone } from '@/components/ui'
+import type { AccountStatus, AdminPartner, ResetResult } from '@/services/adminOps'
+import {
+  Banner,
+  DataTable,
+  ErrorNote,
+  Field,
+  Frame,
+  Modal,
+  Pagination,
+  Select,
+  StatusPill,
+  dangerButton,
+  inputClass,
+  primaryButton,
+  secondaryButton,
+  useConfirm,
+} from '@/components/ui'
+import { useI18n } from '@/i18n'
+import { apiErrorMessage } from '@/lib/errors'
+import { usePartnerActions, usePartners } from '@/queries/admin'
+import { PRACTICE_AREAS, partnerAccountStatus } from '@/services/adminOps'
+
+const STATUS_TONE: Record<AccountStatus, StatusTone> = { invited: 'amber', active: 'green', suspended: 'red' }
+
+export function AccountStatusPill({ status }: { status: AccountStatus }) {
+  const { t } = useI18n()
+  const label = status === 'invited' ? t('adminOps.statusInvited') : status === 'suspended' ? t('adminOps.statusSuspended') : t('adminOps.statusActive')
+  return (
+    <StatusPill tone={STATUS_TONE[status]} dot>
+      {label}
+    </StatusPill>
+  )
+}
+
+/** One-time notice after a reset: the emailed link (section D), or an old-style temporary password. */
+export function ResetNotice({ result, email }: { result: ResetResult; email: string }) {
+  const { t } = useI18n()
+  if (result.temporary_password) {
+    return (
+      <Banner tone="warning">
+        {t('adminOps.temporaryPassword', { email })} <code className="font-mono font-semibold">{result.temporary_password}</code>
+      </Banner>
+    )
+  }
+  return <Banner>{t('adminOps.resetEmailed', { email })}</Banner>
+}
 
 const emptyForm = {
   first_name: '',
@@ -9,207 +57,343 @@ const emptyForm = {
   email: '',
   mobile: '',
   specialty: '',
-  password: '',
+  title: '',
   response_hours: '24',
   partner_status: 'active',
+  practice_areas: [] as Array<string>,
 }
 
 export function PartnersPage() {
-  const [partners, setPartners] = useState<PartnerRow[] | null>(null)
+  const { t, tn } = useI18n()
+  const f = useAdminFormat()
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const partners = usePartners({ page, search })
+  const actions = usePartnerActions()
+  const [confirm, confirmDialog] = useConfirm()
+  const formId = useId()
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
-  const [pending, setPending] = useState(false)
+  const [notice, setNotice] = useState<{ kind: 'text'; text: string } | { kind: 'reset'; result: ResetResult; email: string } | null>(null)
+  const [suspending, setSuspending] = useState<AdminPartner | null>(null)
+  const [reason, setReason] = useState('')
+  const [menu, setMenu] = useState<number | null>(null)
 
-  function load() {
-    void fetchPartners()
-      .then(setPartners)
-      .catch(() => setPartners([]))
+  const failed = actions.unsuspend.error ?? actions.resetPassword.error ?? actions.resendInvite.error
+
+  function close() {
+    setOpen(false)
+    setError('')
   }
-
-  useEffect(load, [])
-
-  useEffect(() => {
-    if (!open) return
-    function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError('')
-    setPending(true)
     try {
-      await createPartner({
-        ...form,
-        mobile: form.mobile.replace(/[\s-]/g, ''),
+      await actions.invite.mutateAsync({
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
+        email: form.email.trim(),
+        mobile: form.mobile.replace(/[\s-]/g, '') || undefined,
+        specialty: form.specialty.trim() || undefined,
+        title: form.title.trim() || undefined,
         response_hours: Number(form.response_hours),
+        partner_status: form.partner_status,
+        practice_areas: form.practice_areas,
       })
+      setNotice({ kind: 'text', text: t('adminOps.inviteSent', { email: form.email.trim() }) })
       setForm(emptyForm)
       setOpen(false)
-      load()
     } catch (caught) {
-      setError(partnerError(caught))
-    } finally {
-      setPending(false)
+      setError(apiErrorMessage(caught, t('adminOps.actionFailed')))
     }
   }
 
+  async function onReset(partner: AdminPartner) {
+    setMenu(null)
+    const ok = await confirm({
+      title: t('adminOps.resetPasswordTitle', { name: partner.name }),
+      description: t('adminOps.resetPasswordBody', { email: partner.email }),
+      confirmLabel: t('adminOps.resetPassword'),
+    })
+    if (!ok) return
+    actions.resetPassword.mutate(partner.id, { onSuccess: (result) => setNotice({ kind: 'reset', result, email: partner.email }) })
+  }
+
+  function onResend(partner: AdminPartner) {
+    setMenu(null)
+    actions.resendInvite.mutate(partner.id, { onSuccess: () => setNotice({ kind: 'text', text: t('adminOps.inviteResent', { email: partner.email }) }) })
+  }
+
+  async function onSuspend(event: FormEvent) {
+    event.preventDefault()
+    if (!suspending) return
+    try {
+      await actions.suspend.mutateAsync({ id: suspending.id, reason: reason.trim() })
+      setNotice({ kind: 'text', text: t('adminOps.partnerSuspended', { name: suspending.name }) })
+      setSuspending(null)
+      setReason('')
+    } catch {
+      // shown in the dialog
+    }
+  }
+
+  const columns: Array<Column<AdminPartner>> = [
+    {
+      key: 'lawyer',
+      header: t('admin.partnersColLawyer'),
+      cell: (partner) => (
+        <>
+          <p className="font-medium">{partner.name}</p>
+          <p className="text-xs text-ash-573">{partner.email}</p>
+          {partner.title ? <p className="text-xs text-ash-573">{partner.title}</p> : null}
+        </>
+      ),
+    },
+    {
+      key: 'areas',
+      header: t('adminOps.practiceAreas'),
+      cell: (partner) =>
+        partner.practice_areas.length === 0 ? (
+          <span className="text-xs text-ash-573">{t('adminOps.allAreasShort')}</span>
+        ) : (
+          <span className="flex max-w-xs flex-wrap gap-1">
+            {partner.practice_areas.map((area) => (
+              <span key={area} className="rounded-full bg-sand-53 px-2 py-0.5 text-[11px] text-ash-773">
+                {f.area(area)}
+              </span>
+            ))}
+          </span>
+        ),
+    },
+    {
+      key: 'window',
+      header: t('admin.partnersColWindow'),
+      className: 'whitespace-nowrap',
+      cell: (partner) => (partner.response_hours ? tn('admin.partnersHours', partner.response_hours) : '—'),
+    },
+    {
+      key: 'status',
+      header: t('admin.colStatus'),
+      cell: (partner) => {
+        const status = partnerAccountStatus(partner)
+        return (
+          <span className="flex flex-col items-start gap-1">
+            <AccountStatusPill status={status} />
+            {status === 'invited' && partner.invitation_expires_at ? (
+              <span className="text-[11px] text-ash-573">{t('adminOps.inviteExpires', { date: f.date(partner.invitation_expires_at) })}</span>
+            ) : null}
+            {partner.partner_status === 'inactive' ? <span className="text-[11px] text-ash-573">{t('admin.partnersInactive')}</span> : null}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'actions',
+      header: <span className="sr-only">{t('adminOps.colActions')}</span>,
+      className: 'text-right',
+      cell: (partner) => {
+        const status = partnerAccountStatus(partner)
+        return (
+          <div className="relative inline-block text-left">
+            <button
+              type="button"
+              className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-ash-41"
+              aria-label={t('adminOps.partnerActions', { name: partner.name })}
+              aria-expanded={menu === partner.id}
+              onClick={() => setMenu(menu === partner.id ? null : partner.id)}
+            >
+              <MoreHorizontal size={16} aria-hidden />
+            </button>
+            {menu === partner.id ? (
+              <div className="absolute right-0 z-20 mt-1 w-52 rounded-2xl border border-sand-86 bg-surface p-1.5 shadow-sm">
+                {status === 'invited' ? (
+                  <MenuItem onClick={() => onResend(partner)}>{t('adminOps.resendInvite')}</MenuItem>
+                ) : (
+                  <MenuItem onClick={() => void onReset(partner)}>{t('adminOps.resetPassword')}</MenuItem>
+                )}
+                {partner.suspended ? (
+                  <MenuItem
+                    onClick={() => {
+                      setMenu(null)
+                      actions.unsuspend.mutate(partner.id, {
+                        onSuccess: () => setNotice({ kind: 'text', text: t('adminOps.partnerUnsuspended', { name: partner.name }) }),
+                      })
+                    }}
+                  >
+                    {t('adminOps.unsuspend')}
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    danger
+                    onClick={() => {
+                      setMenu(null)
+                      setSuspending(partner)
+                    }}
+                  >
+                    {t('adminOps.suspend')}
+                  </MenuItem>
+                )}
+              </div>
+            ) : null}
+          </div>
+        )
+      },
+    },
+  ]
+
+  const set = (key: Exclude<keyof typeof emptyForm, 'practice_areas'>) => (value: string) => setForm((current) => ({ ...current, [key]: value }))
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="serif text-4xl font-medium tracking-[-0.03em]">Partners</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#6d6d6d]">
-            Lawyers who accept tickets when a member needs a person to review the question.
-          </p>
-        </div>
-        <button type="button" className="btn-primary" onClick={() => setOpen(true)}>
-          <Plus size={16} />
-          Add partner
+    <Frame title={t('admin.partnersTitle')} text={t('admin.partnersText')}>
+      {confirmDialog}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <SearchBox
+          label={t('adminOps.partnersSearch')}
+          placeholder={t('adminOps.partnersSearch')}
+          onSearch={(value) => {
+            if (value === search) return
+            setSearch(value)
+            setPage(1)
+          }}
+        />
+        <button type="button" className={primaryButton} onClick={() => setOpen(true)}>
+          <Plus size={16} aria-hidden />
+          {t('adminOps.invitePartner')}
         </button>
       </div>
+      <div className="mb-4 space-y-2" role="status">
+        {notice?.kind === 'text' ? <Banner>{notice.text}</Banner> : null}
+        {notice?.kind === 'reset' ? <ResetNotice result={notice.result} email={notice.email} /> : null}
+      </div>
+      <ErrorNote>{failed ? apiErrorMessage(failed, t('adminOps.actionFailed')) : ''}</ErrorNote>
+
+      <DataTable
+        columns={columns}
+        rows={partners.data?.data}
+        rowKey={(partner) => partner.id}
+        minWidth="min-w-[820px]"
+        loading={partners.isPending}
+        error={partners.data ? undefined : partners.error}
+        onRetry={() => void partners.refetch()}
+        empty={search ? t('adminOps.partnersNoMatch') : t('admin.partnersEmpty')}
+      />
+      <Pagination meta={partners.data?.meta} onPage={setPage} disabled={partners.isFetching} />
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <button
-            type="button"
-            className="absolute inset-0 bg-[#142019]/45"
-            aria-label="Close"
-            onClick={() => setOpen(false)}
-          />
-          <form
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="partner-dialog-title"
-            autoComplete="off"
-            onSubmit={(event) => void onSubmit(event)}
-            className="relative z-10 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-[0_30px_70px_-36px_rgba(18,48,32,0.55)]"
-          >
-            <div className="flex items-center justify-between">
-              <h2 id="partner-dialog-title" className="serif text-2xl font-medium tracking-[-0.03em]">
-                New partner account
-              </h2>
-              <button
-                type="button"
-                className="grid h-9 w-9 place-items-center rounded-full text-[#5c6b63] hover:bg-[#f3f6f4]"
-                aria-label="Close"
-                onClick={() => setOpen(false)}
-              >
-                <X size={16} />
+        <Modal
+          title={t('adminOps.invitePartner')}
+          onClose={close}
+          footer={
+            <>
+              <button type="button" className={secondaryButton} onClick={close}>
+                {t('common.cancel')}
               </button>
+              <button type="submit" form={formId} className={primaryButton} disabled={actions.invite.isPending}>
+                {actions.invite.isPending ? t('common.saving') : t('adminOps.sendInvite')}
+              </button>
+            </>
+          }
+        >
+          <form id={formId} autoComplete="off" className="pb-2" onSubmit={(event) => void onSubmit(event)}>
+            <p className="mb-4 text-sm text-ash-573">{t('adminOps.invitePartnerHelp')}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label={t('admin.partnersFirstName')}>
+                <input required value={form.first_name} onChange={(event) => set('first_name')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={t('admin.partnersLastName')}>
+                <input required value={form.last_name} onChange={(event) => set('last_name')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={t('admin.email')}>
+                <input required type="email" value={form.email} onChange={(event) => set('email')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={`${t('admin.partnersMobile')} (${t('common.optional')})`}>
+                <input value={form.mobile} placeholder="09171234567" onChange={(event) => set('mobile')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={`${t('admin.partnersSpecialty')} (${t('common.optional')})`}>
+                <input value={form.specialty} placeholder={t('admin.partnersSpecialtyExample')} onChange={(event) => set('specialty')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={`${t('adminOps.partnerTitle')} (${t('common.optional')})`}>
+                <input value={form.title} placeholder={t('adminOps.partnerTitleExample')} onChange={(event) => set('title')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={t('admin.partnersWindow')}>
+                <input required type="number" min={1} max={168} value={form.response_hours} onChange={(event) => set('response_hours')(event.target.value)} className={inputClass} />
+              </Field>
+              <Field label={t('admin.colStatus')}>
+                <Select value={form.partner_status} onChange={(event) => set('partner_status')(event.target.value)}>
+                  <option value="active">{t('admin.partnersActive')}</option>
+                  <option value="inactive">{t('admin.partnersInactive')}</option>
+                </Select>
+              </Field>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <Field label="First name" value={form.first_name} onChange={(value) => setForm({ ...form, first_name: value })} autoComplete="off" />
-              <Field label="Last name" value={form.last_name} onChange={(value) => setForm({ ...form, last_name: value })} autoComplete="off" />
-              <Field label="Email" type="email" value={form.email} onChange={(value) => setForm({ ...form, email: value })} autoComplete="off" />
-              <Field label="Mobile number" value={form.mobile} onChange={(value) => setForm({ ...form, mobile: value })} placeholder="09171234567" autoComplete="off" />
-              <Field label="Specialty" value={form.specialty} onChange={(value) => setForm({ ...form, specialty: value })} placeholder="Administrative law" autoComplete="off" />
-              <Field label="Password" type="password" value={form.password} onChange={(value) => setForm({ ...form, password: value })} autoComplete="new-password" />
-              <Field label="Response window (hours)" type="number" value={form.response_hours} onChange={(value) => setForm({ ...form, response_hours: value })} autoComplete="off" />
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-[#3d4c44]">Status</span>
-                <select
-                  value={form.partner_status}
-                  onChange={(event) => setForm({ ...form, partner_status: event.target.value })}
-                  className="h-11 w-full rounded-xl border border-[#e6e1d8] bg-white px-3 text-sm outline-none"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </label>
-            </div>
-            {error ? <p className="mt-3 text-sm text-[#9f2d2d]">{error}</p> : null}
-            <div className="mt-5 flex justify-end gap-3">
-              <button type="button" className="h-11 px-4 text-sm font-medium text-[#5c6b63]" onClick={() => setOpen(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary" disabled={pending}>
-                {pending ? 'Saving' : 'Create partner'}
-              </button>
+            <fieldset className="mt-4">
+              <legend className="mb-1.5 text-xs font-medium text-moss-731">{t('adminOps.practiceAreas')}</legend>
+              <p className="mb-2 text-xs text-ash-573">{t('adminOps.practiceAreasHelp')}</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {PRACTICE_AREAS.map((area) => (
+                  <label key={area} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={form.practice_areas.includes(area)}
+                      onChange={() =>
+                        setForm((current) => ({
+                          ...current,
+                          practice_areas: current.practice_areas.includes(area)
+                            ? current.practice_areas.filter((item) => item !== area)
+                            : [...current.practice_areas, area],
+                        }))
+                      }
+                    />
+                    {f.area(area)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div className="mt-3">
+              <ErrorNote>{error}</ErrorNote>
             </div>
           </form>
-        </div>
+        </Modal>
       ) : null}
 
-      <div className="mt-6 overflow-hidden rounded-3xl border border-[#eceae6] bg-white">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-[#fafaf8] text-[11px] tracking-[0.14em] text-[#8a8a8a] uppercase">
-              <tr>
-                {['Lawyer', 'Specialty', 'Open tickets', 'Response window', 'Status'].map((column) => (
-                  <th key={column} className="px-5 py-3 font-medium">
-                    {column}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {partners === null ? (
-                <tr>
-                  <td colSpan={5} className="px-5 py-16 text-center text-[#6d6d6d]">
-                    Loading partners…
-                  </td>
-                </tr>
-              ) : partners.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-5 py-16 text-center text-[#6d6d6d]">
-                    No partner lawyers are on the platform yet.
-                  </td>
-                </tr>
-              ) : (
-                partners.map((partner) => (
-                  <tr key={partner.id} className="border-t border-[#f3f1ed]">
-                    <td className="px-5 py-4">
-                      <p className="font-medium">{partner.name}</p>
-                      <p className="text-xs text-[#6d6d6d]">{partner.email}</p>
-                    </td>
-                    <td className="px-5 py-4">{partner.specialty}</td>
-                    <td className="px-5 py-4">{partner.open_tickets}</td>
-                    <td className="px-5 py-4">{partner.response_hours} hours</td>
-                    <td className="px-5 py-4 capitalize">{partner.partner_status}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      {suspending ? (
+        <Modal
+          title={t('adminOps.suspendPartnerTitle', { name: suspending.name })}
+          size="max-w-md"
+          onClose={() => setSuspending(null)}
+          footer={
+            <>
+              <button type="button" className={secondaryButton} onClick={() => setSuspending(null)}>
+                {t('common.cancel')}
+              </button>
+              <button type="submit" form="suspend-partner" className={dangerButton} disabled={actions.suspend.isPending}>
+                {t('adminOps.suspend')}
+              </button>
+            </>
+          }
+        >
+          <form id="suspend-partner" className="space-y-3 pb-2" onSubmit={(event) => void onSuspend(event)}>
+            <p className="text-sm text-ash-573">{t('adminOps.suspendPartnerBody')}</p>
+            <Field label={`${t('adminOps.suspendReason')} (${t('common.optional')})`}>
+              <textarea maxLength={300} value={reason} onChange={(event) => setReason(event.target.value)} className={`${inputClass} h-24 py-2`} />
+            </Field>
+            <ErrorNote>{actions.suspend.isError ? apiErrorMessage(actions.suspend.error, t('adminOps.actionFailed')) : ''}</ErrorNote>
+          </form>
+        </Modal>
+      ) : null}
+    </Frame>
   )
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  type = 'text',
-  placeholder,
-  autoComplete,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  type?: string
-  placeholder?: string
-  autoComplete?: string
-}) {
+function MenuItem({ children, onClick, danger = false }: { children: string; onClick: () => void; danger?: boolean }) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-medium text-[#3d4c44]">{label}</span>
-      <input
-        required
-        type={type}
-        min={type === 'number' ? 1 : undefined}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full rounded-xl border border-[#e6e1d8] bg-white px-3 text-sm outline-none focus:border-[#0e6b3e]"
-      />
-    </label>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-ash-41 ${danger ? 'text-rust-600' : 'text-ash-890'}`}
+    >
+      {children}
+    </button>
   )
 }

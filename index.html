@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/gabaymo-logo.png" />
     <meta name="theme-color" content="#0e6b3e" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <script>
+      // Apply the saved theme and language before first paint (no flash).
+      try {
+        var theme = localStorage.getItem('gabaymo_theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
+        if (localStorage.getItem('gabaymo_locale') === 'fil') document.documentElement.lang = 'fil'
+      } catch (e) {}
+    </script>
     <meta name="title" content="GabayMo" />
     <meta
       name="description"

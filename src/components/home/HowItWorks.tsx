@@ -1,62 +1,38 @@
-import { MessageSquare, Search, Quote, UserRound } from 'lucide-react'
-
+import { MessageSquare, Quote, Search, UserRound } from 'lucide-react'
 import { Reveal } from './Reveal'
+import type { LucideIcon } from 'lucide-react'
 
-const steps = [
-  {
-    n: '01',
-    icon: MessageSquare,
-    title: 'Ask in plain language',
-    body: 'Describe the situation the way you would to a colleague — a MOOE expense, a teacher workload concern, a liquidation question.',
-  },
-  {
-    n: '02',
-    icon: Search,
-    title: 'GabayMo searches the library',
-    body: 'Every question runs against the indexed DepEd Orders, Memoranda, Republic Acts, CSC rules and court decisions approved in your library.',
-  },
-  {
-    n: '03',
-    icon: Quote,
-    title: 'Read it with the citation',
-    body: 'Each answer comes with the document title, number, page, provision and the exact excerpt — so you can open the source and verify it.',
-  },
-  {
-    n: '04',
-    icon: UserRound,
-    title: 'Escalate when it matters',
-    body: 'Type /help to open a support ticket and a partner lawyer reviews your concern within the 24-hour response window.',
-  },
+import type { MessageKey } from '@/i18n'
+import { useI18n } from '@/i18n'
+
+const steps: Array<{ n: string; icon: LucideIcon; title: MessageKey; body: MessageKey }> = [
+  { n: '01', icon: MessageSquare, title: 'home.step1Title', body: 'home.step1Body' },
+  { n: '02', icon: Search, title: 'home.step2Title', body: 'home.step2Body' },
+  { n: '03', icon: Quote, title: 'home.step3Title', body: 'home.step3Body' },
+  { n: '04', icon: UserRound, title: 'home.step4Title', body: 'home.step4Body' },
 ]
 
 export function HowItWorks() {
+  const { t } = useI18n()
   return (
     <section id="how-it-works" className="px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-6xl">
         <Reveal>
-          <p className="text-xs font-semibold tracking-[0.18em] text-[#0e6b3e]">
-            HOW IT WORKS
-          </p>
-          <h2 className="serif mt-3 max-w-xl text-4xl leading-tight font-medium tracking-[-0.03em] text-[#142019] sm:text-5xl">
-            From a question to a verifiable answer.
-          </h2>
+          <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">{t('home.howEyebrow')}</p>
+          <h2 className="serif mt-3 max-w-xl text-4xl leading-tight font-medium tracking-[-0.03em] text-moss-898 sm:text-5xl">{t('home.howTitle')}</h2>
         </Reveal>
         <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {steps.map((step, index) => (
             <Reveal key={step.n} delay={index * 90}>
-              <article className="lift-card h-full rounded-[22px] border border-[#e6eeea] bg-white p-6">
+              <article className="lift-card h-full rounded-[22px] border border-line bg-surface p-6">
                 <div className="flex items-start justify-between">
-                  <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#eef6f1] text-[#0e6b3e]">
+                  <span aria-hidden className="grid h-10 w-10 place-items-center rounded-2xl bg-moss-51 text-brand">
                     <step.icon size={18} />
                   </span>
-                  <span className="text-sm text-[#b7c4bc]">{step.n}</span>
+                  <span className="text-sm text-moss-257">{step.n}</span>
                 </div>
-                <h3 className="mt-6 text-[17px] font-semibold text-[#173026]">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#5d6b64]">
-                  {step.body}
-                </p>
+                <h3 className="mt-6 text-[17px] font-semibold text-moss-861">{t(step.title)}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-moss-608">{t(step.body)}</p>
               </article>
             </Reveal>
           ))}
