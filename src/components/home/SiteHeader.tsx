@@ -41,14 +41,14 @@ export function SiteHeader() {
           : 'border-transparent bg-surface/75 backdrop-blur-sm'
       }`}
     >
-      <div className="relative mx-auto flex h-[78px] max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+      <div className="relative mx-auto flex h-[78px] max-w-6xl items-center justify-between gap-6 px-5 sm:px-8">
         <a href="#home" className="shrink-0" aria-label={t('home.logoLabel')}>
           <img src="/gabaymo-logo.png" alt="" className="h-12 w-auto sm:h-14" />
         </a>
 
         <nav
           aria-label={t('home.navLabel')}
-          className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 text-[14.5px] xl:gap-7 text-moss-735 lg:flex"
+          className="hidden flex-1 items-center justify-center gap-6 text-[14.5px] whitespace-nowrap text-moss-735 xl:flex 2xl:gap-7"
         >
           {links.map((link) => (
             <a
@@ -61,7 +61,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 xl:flex">
           <ThemeToggle compact />
           <LanguageSwitcher compact />
           {member ? (
@@ -83,7 +83,7 @@ export function SiteHeader() {
           )}
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <ThemeToggle compact />
           <LanguageSwitcher compact />
           <button
@@ -108,7 +108,7 @@ export function SiteHeader() {
         <div
           ref={panelRef}
           id="site-mobile-menu"
-          className="border-t border-moss-80 bg-surface px-5 py-4 lg:hidden"
+          className="border-t border-moss-80 bg-surface px-5 py-4 xl:hidden"
         >
           <nav aria-label={t('home.navLabel')} className="flex flex-col gap-1">
             {links.map((link) => (
