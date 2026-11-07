@@ -48,10 +48,12 @@ export const adminKnowledge = {
   regionUnknown: 'Region unknown',
   regionCode: 'Region {code}',
   preferredTitle: 'Matched partner answers',
-  preferredMeta: '[{marker}] Partner #{partner} · {score}% match · written from [{source}]',
+  preferredMeta:
+    '[{marker}] Partner #{partner} · {score}% match · written from [{source}]',
   preferredQuestion: 'Q: {text}',
   preferredAnswer: 'A: {text}',
-  preferredFootnote: 'The documents answer is written from the sources only; the best match becomes “A partner’s take”.',
+  preferredFootnote:
+    'The documents answer is written from the sources only; the best match becomes “A partner’s take”.',
   // Document detail
   docLoading: 'Loading document…',
   docLoadError: 'Could not load this document',
@@ -61,7 +63,8 @@ export const adminKnowledge = {
   docRevokedBy: 'Revoked by {by}',
   docSupersededBy: 'Superseded by {by}',
   docEffectiveParen: '(effective {date})',
-  docOutdatedNote: '. Answers cite this issuance only as an outdated reference and must also cite the newer one.',
+  docOutdatedNote:
+    '. Answers cite this issuance only as an outdated reference and must also cite the newer one.',
   docTabsLabel: 'Document sections',
   docTabOverview: 'Overview',
   docTabText: 'Extracted text',
@@ -105,9 +108,11 @@ export const adminKnowledge = {
   notExtracted: 'Not extracted yet.',
   processingSteps: 'Processing steps',
   approvalReadiness: 'Approval readiness',
-  noBlockingIssues: 'No blocking issues (the reviewer still confirms the checklist).',
+  noBlockingIssues:
+    'No blocking issues (the reviewer still confirms the checklist).',
   archiveTitle: 'Archive this document?',
-  archivePrompt: 'Why archive this document? It stops being used in answers immediately.',
+  archivePrompt:
+    'Why archive this document? It stops being used in answers immediately.',
   archiveReason: 'Reason (at least 3 characters)',
   fieldTitle: 'Document title',
   fieldType: 'Document type',
@@ -127,19 +132,23 @@ export const adminKnowledge = {
   fieldKeywordsPlaceholder: 'MOOE, internet, liquidation',
   fieldDescription: 'Description',
   metadataSaveFailed: 'Could not save metadata.',
-  metadataApprovedNote: 'This version is approved. Saving creates a new version that goes back to Source Review; the approved one keeps answering until then.',
-  metadataCorrectionNote: 'Changes are recorded as corrections on this version.',
+  metadataApprovedNote:
+    'This version is approved. Saving creates a new version that goes back to Source Review; the approved one keeps answering until then.',
+  metadataCorrectionNote:
+    'Changes are recorded as corrections on this version.',
   correctionNote: 'Correction note',
   correctionNotePlaceholder: 'e.g. Corrected the memorandum number',
   versionUploadFailed: 'Could not upload the new version.',
   revisionTitle: 'Upload a new version',
-  revisionHelp: 'The current approved version keeps answering until the new file is extracted, reviewed and approved.',
+  revisionHelp:
+    'The current approved version keeps answering until the new file is extracted, reviewed and approved.',
   upload: 'Upload',
   chooseFile: 'Choose file',
   whatChanged: 'What changed?',
   publishRetrying: 'Publishing again. This page refreshes while it runs.',
   publishRetryFailed: 'Could not start publishing again.',
-  publishFailedTitle: 'Approved, but publishing failed. This version is not used in answers yet.',
+  publishFailedTitle:
+    'Approved, but publishing failed. This version is not used in answers yet.',
   publishNoDetail: 'No error detail was recorded.',
   publishLastAttempt: 'Last attempt {date}',
   // Extracted text viewer
@@ -159,12 +168,14 @@ export const adminKnowledge = {
   hideOriginal: 'Hide original',
   compareOriginal: 'Compare with original',
   ocrConfidence: 'OCR confidence {percent}%',
-  showMachineExtraction: 'Show machine extraction (corrected by {name}, rev. {revision})',
+  showMachineExtraction:
+    'Show machine extraction (corrected by {name}, rev. {revision})',
   reviewer: 'reviewer',
   legendRegion: 'region',
   legendIssuance: 'issuance no.',
   legendDate: 'date',
-  needsOcrBanner: 'This page has no reliable text layer. GabayMo will not invent its text: re-extract with OCR, or type the text from the original page as a correction.',
+  needsOcrBanner:
+    'This page has no reliable text layer. GabayMo will not invent its text: re-extract with OCR, or type the text from the original page as a correction.',
   correctedText: 'Corrected page text',
   correctionReason: 'Why the correction? (required)',
   saveCorrection: 'Save correction',
@@ -172,23 +183,31 @@ export const adminKnowledge = {
   correctPage: 'Correct this page’s text',
   cannotShowInline: 'This {ext} file cannot be shown inline.',
   downloadOriginal: 'Download the original',
-  textFootnote: 'This is exactly the text GabayMo will chunk and embed after approval. Machine extraction is kept; corrections are stored as new revisions.',
+  textFootnote:
+    'This is exactly the text GabayMo will chunk and embed after approval. Machine extraction is kept; corrections are stored as new revisions.',
   // Applicability (regions)
   relIssuedBy: 'Issued by',
-  relIssuedByHelp: 'Where the issuance comes from. Does not by itself decide where it applies.',
+  relIssuedByHelp:
+    'Where the issuance comes from. Does not by itself decide where it applies.',
   relAppliesTo: 'Applies to',
   relAppliesToHelp: 'Where its rules govern. This is what answering uses.',
   relExceptions: 'Exceptions',
   relExceptionsHelp: 'Places explicitly excluded.',
   relMentioned: 'Mentioned in the text',
-  relMentionedHelp: 'Places named in passing (examples, references). No legal effect.',
-  warnDisseminates: 'This memo disseminates another issuance (e.g. a DepEd Order or Regional Memorandum). Its own scope is the issuing office. If the enclosed issuance should answer questions for everyone it covers, upload it as its own document.',
-  warnNationalLanguage: '“Nationwide” wording was found, most likely in an enclosure or quoted issuance; it was not treated as this document’s own scope.',
-  warnConflictingSignals: 'The text points to different scopes. Set the applicability by hand.',
-  warnDivisionNotIdentified: 'This is a division memorandum, but its schools division could not be read from the letterhead. Set it by hand.',
+  relMentionedHelp:
+    'Places named in passing (examples, references). No legal effect.',
+  warnDisseminates:
+    'This memo disseminates another issuance (e.g. a DepEd Order or Regional Memorandum). Its own scope is the issuing office. If the enclosed issuance should answer questions for everyone it covers, upload it as its own document.',
+  warnNationalLanguage:
+    '“Nationwide” wording was found, most likely in an enclosure or quoted issuance; it was not treated as this document’s own scope.',
+  warnConflictingSignals:
+    'The text points to different scopes. Set the applicability by hand.',
+  warnDivisionNotIdentified:
+    'This is a division memorandum, but its schools division could not be read from the letterhead. Set it by hand.',
   warnConflictingRegions: 'The letterhead names more than one region.',
   warnLowConfidence: 'The scope signals are weak. Check it by hand.',
-  warnHistoricalRegion: 'An old region name was found (e.g. “Region IV”). Pick the current region.',
+  warnHistoricalRegion:
+    'An old region name was found (e.g. “Region IV”). Pick the current region.',
   division: 'Division',
   regionsLoadError: 'Could not load the region list',
   scopeLabel: 'Scope: {scope}',
@@ -196,11 +215,13 @@ export const adminKnowledge = {
   notVerified: 'Not verified yet',
   correctApplicability: 'Correct applicability',
   confidenceParen: '(confidence {percent}%)',
-  aiSuggestion: 'AI suggestion (not applied, needs your decision): {scope}{regions} — {rationale}',
+  aiSuggestion:
+    'AI suggestion (not applied, needs your decision): {scope}{regions} — {rationale}',
   none: 'None',
   applicabilitySaveFailed: 'Could not save applicability.',
   applicabilityTitle: 'Correct geographic applicability',
-  applicabilityHelp: 'Record where the rules apply — not where the document was issued or which places it mentions.',
+  applicabilityHelp:
+    'Record where the rules apply — not where the document was issued or which places it mentions.',
   scope: 'Scope',
   scopeNational: 'National (all regions, minus exceptions)',
   scopeRegional: 'Regional (one or more regions)',
@@ -208,7 +229,8 @@ export const adminKnowledge = {
   nationalExceptions: 'Exceptions (regions the national rule does not cover)',
   verifiedAgainstIssuance: 'I verified this against the issuance',
   note: 'Note',
-  applicabilityNotePlaceholder: 'e.g. Header says Region VIII but the memo covers NCR schools',
+  applicabilityNotePlaceholder:
+    'e.g. Header says Region VIII but the memo covers NCR schools',
   // Chunks, versions, relations
   chunksLoading: 'Loading chunks…',
   chunksLoadError: 'Could not load the chunks',
@@ -246,9 +268,11 @@ export const adminKnowledge = {
   thisDocumentRelates: 'This document {relation} it',
   // Knowledge Library page + upload
   libraryTitle: 'Knowledge Library',
-  libraryDescription: 'Upload the orders, memoranda and decisions GabayMo answers from. Nothing can be cited until a reviewer approves the exact version in Source Review.',
+  libraryDescription:
+    'Upload the orders, memoranda and decisions GabayMo answers from. Nothing can be cited until a reviewer approves the exact version in Source Review.',
   uploadDocument: 'Upload document',
-  lifecycleBanner: 'Lifecycle: uploaded → text extracted page by page → region and issuance details detected → Source Review → approved → indexed → published. Successful extraction or embedding never counts as approval.',
+  lifecycleBanner:
+    'Lifecycle: uploaded → text extracted page by page → region and issuance details detected → Source Review → approved → indexed → published. Successful extraction or embedding never counts as approval.',
   librarySearchPlaceholder: 'Title, number or issuing office',
   status: 'Status',
   allStatuses: 'All statuses',
@@ -274,7 +298,8 @@ export const adminKnowledge = {
   libraryLoadError: 'Could not load the knowledge library',
   noDocumentsMatch: 'No documents match',
   uploadADocument: 'Upload a document',
-  noDocumentsHelp: 'Start with the DepEd orders and memoranda school heads ask about most, like MOOE liquidation and teacher workload.',
+  noDocumentsHelp:
+    'Start with the DepEd orders and memoranda school heads ask about most, like MOOE liquidation and teacher workload.',
   colDocument: 'Document',
   colAppliesTo: 'Applies to',
   colStatus: 'Status',
@@ -285,7 +310,24 @@ export const adminKnowledge = {
   previous: 'Previous',
   next: 'Next',
   pageOf: 'Page {page} of {total}',
-  uploadedNotice: '“{title}” was uploaded. Text extraction is running; it will wait in Source Review when ready.',
+  uploadedNotice:
+    '“{title}” was uploaded. Text extraction is running; it will wait in Source Review when ready.',
+  uploadedApproveNotice:
+    '“{title}” was uploaded. It will be approved and published automatically when text extraction finishes, unless something needs a manual check.',
+  uploadAndNext: 'Upload & next',
+  approveCheckAuthenticity: 'I checked this file against the official issuance',
+  approveCheckApplicability: 'The applicability I chose above is correct',
+  uploadAndApprove: 'Upload & approve',
+  approveOnUpload: 'Approve automatically when ready',
+  approveOnUploadHelp:
+    'Skips the separate Source Review step. Once the text is extracted, the same approval checks run; if anything needs a person (unreadable pages, missing details), it waits in Source Review instead. Recorded as a self-approval.',
+  approveOnUploadNeedsScope:
+    'Choose “National” or specific regions under “Known applicability” to approve on upload.',
+  approveOnUploadReason:
+    'Reason (optional), e.g. “Bulk loading official issuances”',
+  autoApprovalPending: 'Approves when ready',
+  autoApprovalNeedsReview: 'Needs manual review',
+  autoApprovalStopped: 'Automatic approval stopped. Review it here:',
   documentDrawerTitle: 'Knowledge document',
   fileTooLarge: 'That file is larger than {max} MB.',
   fileWrongType: 'Upload a PDF, DOCX, TXT or Markdown file.',
@@ -301,14 +343,16 @@ export const adminKnowledge = {
   visibilityPartnerPrivate: 'Partner-private',
   visibilityPartnerShared: 'Partner-shared',
   owningPartner: 'Owning partner #',
-  knownApplicability: 'Known applicability (optional, still verified in review)',
+  knownApplicability:
+    'Known applicability (optional, still verified in review)',
   detectFromDocument: 'Detect from the document',
   specificRegions: 'Specific region(s)',
   regions: 'Regions',
   uploading: 'Uploading…',
   // Source Review
   sourceReviewTitle: 'Source Review',
-  sourceReviewDescription: 'Read each document against the issuance it came from, check where it applies, then approve, return or reject that exact version. Only approved versions are published for answers.',
+  sourceReviewDescription:
+    'Read each document against the issuance it came from, check where it applies, then approve, return or reject that exact version. Only approved versions are published for answers.',
   documents: 'Documents',
   reviewQueues: 'Review queues',
   queueWaiting: 'Waiting',
@@ -319,9 +363,11 @@ export const adminKnowledge = {
   noQueueDocuments: 'No {queue} documents.',
   uploadedOn: 'uploaded {date}',
   selectDocument: 'Select a document',
-  selectDocumentHelp: 'Choose a document on the left to compare its extracted text with the original file, check its regions, and decide.',
+  selectDocumentHelp:
+    'Choose a document on the left to compare its extracted text with the original file, check its regions, and decide.',
   reviewNoteRequired: 'Add a note so the uploader knows what to fix.',
-  reviewApproved: 'Version {version} of “{title}” is approved and is being published.',
+  reviewApproved:
+    'Version {version} of “{title}” is approved and is being published.',
   reviewReturned: '“{title}” was returned with your note.',
   reviewRejected: '“{title}” was rejected.',
   reviewFailed: 'Could not record the decision.',
@@ -329,26 +375,32 @@ export const adminKnowledge = {
   aReviewer: 'a reviewer',
   publicationStatus: 'Publication: {status}.',
   reviewVersion: 'Review version {version}',
-  checkAuthenticity: 'I checked this file against the official issuance (authenticity)',
+  checkAuthenticity:
+    'I checked this file against the official issuance (authenticity)',
   checkApplicability: 'Geographic applicability is correct (Regions tab)',
   checkOcr: 'OCR text matches the scanned pages',
   reviewNoteLabel: 'Review note',
-  reviewNotePlaceholder: 'Review note (required to return or reject), e.g. “Page 3 extraction is incomplete.”',
+  reviewNotePlaceholder:
+    'Review note (required to return or reject), e.g. “Page 3 extraction is incomplete.”',
   selfApprovalSummary: 'I uploaded this document (self-approval exception)',
   selfApprovalPlaceholder: 'Recorded justification (administrators only)',
   reject: 'Reject',
   returnWithNote: 'Return with note',
   approveVersion: 'Approve version {version}',
-  returnedHelp: 'Returned versions are approved after the uploader re-submits them.',
+  returnedHelp:
+    'Returned versions are approved after the uploader re-submits them.',
   // Knowledge Search
   checkPassed: '(passed)',
   checkFailed: '(failed)',
   searchTitle: 'Knowledge Search',
-  searchDescription: 'Test a school head’s question against the real retrieval pipeline: region rules, approval and publication checks, partner scope and citations.',
-  searchBanner: '“Search sources” runs retrieval only and costs nothing beyond one cached embedding. “Generate AI answer” also drafts and validates an answer; it is not saved to the review queue or sent to anyone. A high similarity score never makes an answer verified.',
+  searchDescription:
+    'Test a school head’s question against the real retrieval pipeline: region rules, approval and publication checks, partner scope and citations.',
+  searchBanner:
+    '“Search sources” runs retrieval only and costs nothing beyond one cached embedding. “Generate AI answer” also drafts and validates an answer; it is not saved to the review queue or sent to anyone. A high similarity score never makes an answer verified.',
   searchFailed: 'The search could not run.',
   question: 'Question',
-  questionPlaceholder: 'e.g. Can I use MOOE to pay for an internet subscription?',
+  questionPlaceholder:
+    'e.g. Can I use MOOE to pay for an internet subscription?',
   askAsRegion: 'Ask as region',
   askAs: 'Ask as {name} ({code})',
   searchMode: 'Search mode',
@@ -364,10 +416,13 @@ export const adminKnowledge = {
   searchSources: 'Search sources',
   generateAnswer: 'Generate AI answer',
   searchEmptyTitle: 'Ask a school head’s question',
-  searchEmptyText: 'See which approved passages would govern for the chosen region, which were excluded and why, and what an answer would cite.',
-  needsRegion: 'This question depends on regional or division issuances. Pick a region to test it.',
+  searchEmptyText:
+    'See which approved passages would govern for the chosen region, which were excluded and why, and what an answer would cite.',
+  needsRegion:
+    'This question depends on regional or division issuances. Pick a region to test it.',
   sourcesCount: 'Sources ({count})',
-  noSources: 'No approved, applicable source matched. GabayMo would say it has no source and offer a partner ticket.',
+  noSources:
+    'No approved, applicable source matched. GabayMo would say it has no source and offer a partner ticket.',
   searchHistory: 'Search history',
   noSearches: 'No searches yet.',
   noRegion: 'no region',
@@ -386,7 +441,8 @@ export const adminKnowledge = {
   openSourceDocument: 'Open source document',
   answerReadyNeedsReview: 'Ready (still needs human review)',
   aiAnswerTest: 'AI answer (test)',
-  partnerTakeSearch: 'A partner’s take (shown to paid members under the answer)',
+  partnerTakeSearch:
+    'A partner’s take (shown to paid members under the answer)',
   whyReviewer: 'Why it needs a reviewer',
   claimsChecks: 'Claims and citation checks',
   interpretation: 'Interpretation:',
@@ -415,7 +471,8 @@ export const adminKnowledge = {
   statCost: 'Estimated cost',
   statModel: 'Model',
   excludedCandidates: 'Excluded candidates',
-  excludedNone: 'None. Other-region documents are filtered out before scoring (see filters).',
+  excludedNone:
+    'None. Other-region documents are filtered out before scoring (see filters).',
   effectiveFilters: 'Effective vector filters',
   exclOtherRegion: 'Another region’s issuance',
   exclUserRegionUnknown: 'Regional issuance; user region unknown',
@@ -433,27 +490,33 @@ export const adminKnowledge = {
   exclUnknownApplicability: 'Applicability unknown',
   // Service Instructions
   instructionsTitle: 'Service Instructions',
-  instructionsDescription: 'Rules GabayMo follows when it answers. Global rules apply to every answer; partner rules add style within a partner’s scope and can never override mandatory global rules.',
-  instructionsBanner: 'Precedence: built-in system policy → mandatory global rules → partner rules → other global rules. Changes apply to the next answer immediately; no document is re-embedded.',
+  instructionsDescription:
+    'Rules GabayMo follows when it answers. Global rules apply to every answer; partner rules add style within a partner’s scope and can never override mandatory global rules.',
+  instructionsBanner:
+    'Precedence: built-in system policy → mandatory global rules → partner rules → other global rules. Changes apply to the next answer immediately; no document is re-embedded.',
   instructionScope: 'Instruction scope',
   globalInstructions: 'Global instructions',
   partnerInstructions: 'Partner instructions',
   partner: 'Partner',
   noPartnersYet: 'No partners yet',
   partnersLoadError: 'Could not load partners',
-  addPartnerFirst: 'Add a partner first, then give them their own instructions.',
+  addPartnerFirst:
+    'Add a partner first, then give them their own instructions.',
   whatCanCite: 'What GabayMo can cite',
   countPublished: 'Published',
-  countPublishedHelp: 'Approved in Source Review and indexed. The only documents an answer may cite.',
+  countPublishedHelp:
+    'Approved in Source Review and indexed. The only documents an answer may cite.',
   countWaiting: 'Waiting in Source Review',
   countWaitingHelp: 'Not used until a reviewer approves the version.',
   countExcluded: 'Returned, rejected or failed',
   countExcludedHelp: 'Never used in answers.',
-  everyEditVersioned: 'Every edit is versioned; open a rule’s history to see earlier wording.',
+  everyEditVersioned:
+    'Every edit is versioned; open a rule’s history to see earlier wording.',
   instructionsLoading: 'Loading instructions…',
   instructionsLoadError: 'Could not load instructions',
   instructionsNeedTitle: 'Every instruction needs a title and the rule itself.',
-  instructionsSaved: 'Saved. New answers follow these instructions from now on.',
+  instructionsSaved:
+    'Saved. New answers follow these instructions from now on.',
   instructionsSaveFailed: 'Could not save instructions.',
   archiveInstructionTitle: 'Archive “{title}”?',
   archiveInstructionBody: 'It stops applying to new answers.',
@@ -485,7 +548,8 @@ export const adminKnowledge = {
   historyLoadError: 'Could not load the history',
   // AI Review queue
   aiReviewTitle: 'AI Review Queue',
-  aiReviewDescription: 'Every answer GabayMo drafts waits here until a person checks its citations and sends it. Nothing is sent automatically.',
+  aiReviewDescription:
+    'Every answer GabayMo drafts waits here until a person checks its citations and sends it. Nothing is sent automatically.',
   reviewStatus: 'Answer status',
   tabOpen: 'Open',
   tabHandoff: 'Handoff',
@@ -506,19 +570,23 @@ export const adminKnowledge = {
   assignedTo: 'Assigned to {name}',
   revisionN: 'revision {revision}',
   selectAnswer: 'Select an answer',
-  selectAnswerHelp: 'Pick a draft on the left to compare each sentence with the page it cites, then send, edit, regenerate, reject, or hand it to a partner.',
+  selectAnswerHelp:
+    'Pick a draft on the left to compare each sentence with the page it cites, then send, edit, regenerate, reject, or hand it to a partner.',
   answerLoading: 'Loading answer…',
   answerLoadError: 'Could not load this answer',
-  questionMeta: '{actor} #{user} · region {region} · credit {credit} · asked {asked}',
+  questionMeta:
+    '{actor} #{user} · region {region} · credit {credit} · asked {asked}',
   unknownLower: 'unknown',
   riskLevel: '{level} risk',
   whyReviewerNeeded: 'Why a reviewer is needed',
   stillDrafting: 'GabayMo is still drafting this answer…',
   fromDocumentsDraft: 'From the documents (draft)',
-  partnerTakeMeta: 'A partner’s take · partner #{partner} · {score}% match · {method}',
+  partnerTakeMeta:
+    'A partner’s take · partner #{partner} · {score}% match · {method}',
   takeAdapted: 'adapted to this question',
   takeOwnWords: 'partner’s own words',
-  partnerTakeHelp: 'Sent with the answer unless you untick it when approving. It is not cited and is labelled as general information.',
+  partnerTakeHelp:
+    'Sent with the answer unless you untick it when approving. It is not cited and is labelled as general information.',
   sentenceBySentence: 'Sentence by sentence',
   supportCheck: 'Support check:',
   regionalNote: 'Regional note: {note}',
@@ -529,9 +597,11 @@ export const adminKnowledge = {
   regenerate: 'Regenerate',
   handOff: 'Hand off to partner',
   edit: 'Edit',
-  hardBlockedTitle: 'A hard citation issue blocks sending. Edit or regenerate first.',
+  hardBlockedTitle:
+    'A hard citation issue blocks sending. Edit or regenerate first.',
   approveAndSend: 'Approve & send',
-  hardBlocked: 'A hard citation issue blocks sending. Edit the answer or regenerate it.',
+  hardBlocked:
+    'A hard citation issue blocks sending. Edit the answer or regenerate it.',
   appliesNationwide: 'applies to the whole country',
   appliesToRegions: 'applies to {regions}',
   historySummary: 'Conversation, revisions and review history',
@@ -548,25 +618,31 @@ export const adminKnowledge = {
   actionRegenerateTitle: 'Regenerate the answer',
   actionAssignTitle: 'Assign',
   approveTickRequired: 'Tick the box to confirm you checked the cited pages.',
-  approveNoteRequired: 'This answer needs confirmation. Add a note on what you checked.',
+  approveNoteRequired:
+    'This answer needs confirmation. Add a note on what you checked.',
   approvedNotice: 'Answer approved. It is being sent to the member.',
   rejectReasonRequired: 'Say why it is rejected.',
   rejectedNotice: 'Answer rejected. The member was not charged.',
   answerEmpty: 'The answer cannot be empty.',
   editedNotice: 'Edited answer saved as a new revision and re-checked.',
-  handoffNotice: 'Handed off. A partner ticket was opened and the member was not charged.',
+  handoffNotice:
+    'Handed off. A partner ticket was opened and the member was not charged.',
   regenerateNotice: 'Regenerating. The new draft will appear in the queue.',
-  regenerateGuidance: 'Guidance for the new draft (optional), e.g. “Answer only for Region VIII.”',
+  regenerateGuidance:
+    'Guidance for the new draft (optional), e.g. “Answer only for Region VIII.”',
   reasonRequired: 'Reason (required)',
   whatYouChecked: 'What you checked (required)',
   noteOptional: 'Note (optional)',
   sendToMember: 'Send to member',
-  editHelp: 'Keep the [S1]-style markers on sentences that rely on a source. The edit is saved as a new revision and every citation is checked again.',
-  approveCheck: 'I checked each cited page and the answer says only what the sources say.',
+  editHelp:
+    'Keep the [S1]-style markers on sentences that rely on a source. The edit is saved as a new revision and every citation is checked again.',
+  approveCheck:
+    'I checked each cited page and the answer says only what the sources say.',
   includePartnerTake: 'Include “A partner’s take” under the answer.',
   reasonInsufficientEvidence: 'No approved source covers the question',
   reasonOutOfScope: 'The question is outside what GabayMo answers',
-  reasonNoGoverningEvidence: 'No source governs the member’s region; only references were found',
+  reasonNoGoverningEvidence:
+    'No source governs the member’s region; only references were found',
   reasonUnknownSource: 'A citation points to a source that was not retrieved',
   reasonSourceWithdrawn: 'A cited source has been withdrawn',
   reasonNotCurrentVersion: 'A citation is not the published version',
@@ -577,7 +653,8 @@ export const adminKnowledge = {
   reasonUncitedClaim: 'A factual sentence has no citation',
   reasonUnknownMarker: 'The answer uses a source marker that does not exist',
   reasonNoClaims: 'The model returned no checkable sentences',
-  reasonReferenceNotLabeled: 'Another region’s rule is not labeled as reference',
+  reasonReferenceNotLabeled:
+    'Another region’s rule is not labeled as reference',
   reasonOutdatedNotLabeled: 'An outdated issuance is not labeled as outdated',
   reasonNewerNotCited: 'Cites an outdated issuance without the newer one',
   reasonUnverifiedNumber: 'Names an issuance number not found in the sources',
@@ -589,13 +666,17 @@ export const adminKnowledge = {
   reasonRegionalExceptions: 'A national rule has regional exceptions',
   reasonSourceAmended: 'A cited issuance has been amended',
   // Evidence search (shared with the partner portal)
-  evidencePlaceholder: 'e.g. Can MOOE pay for the school’s internet subscription?',
-  evidenceEmptyText: 'Run a question to see which approved paragraphs GabayMo could cite as evidence, and which words matched.',
+  evidencePlaceholder:
+    'e.g. Can MOOE pay for the school’s internet subscription?',
+  evidenceEmptyText:
+    'Run a question to see which approved paragraphs GabayMo could cite as evidence, and which words matched.',
   allShelves: 'All shelves',
   libraryLoading: 'Loading the library…',
   noEvidenceTitle: 'No approved evidence found',
-  noEvidenceText: 'Nothing approved matches “{query}”. GabayMo would have to say it has no source and offer a partner ticket.',
-  noEvidenceShelfText: 'Nothing approved on the {shelf} shelf matches “{query}”. GabayMo would have to say it has no source and offer a partner ticket.',
+  noEvidenceText:
+    'Nothing approved matches “{query}”. GabayMo would have to say it has no source and offer a partner ticket.',
+  noEvidenceShelfText:
+    'Nothing approved on the {shelf} shelf matches “{query}”. GabayMo would have to say it has no source and offer a partner ticket.',
   evidenceCount_one: '{count} document with evidence for “{query}”',
   evidenceCount_other: '{count} documents with evidence for “{query}”',
   matchingWords_one: '{count} matching word',

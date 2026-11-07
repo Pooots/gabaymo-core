@@ -2,7 +2,14 @@ import { useState } from 'react'
 import { Check, LoaderCircle, Undo2, XCircle } from 'lucide-react'
 
 import type { DocumentDetail as Detail } from '@/services/ai'
-import { Banner, ErrorNote, SectionLabel, inputClass, primaryButton, secondaryButton } from '@/components/ui'
+import {
+  Banner,
+  ErrorNote,
+  SectionLabel,
+  inputClass,
+  primaryButton,
+  secondaryButton,
+} from '@/components/ui'
 import { useI18n } from '@/i18n'
 import { useReviewDecision } from '@/queries/adminKnowledge'
 import { aiError, formatDate } from '@/services/ai'
@@ -10,11 +17,21 @@ import { aiError, formatDate } from '@/services/ai'
 type Decision = 'approve' | 'return' | 'reject'
 
 /** Source Review checklist + approve / return / reject for the current version. */
-export function ReviewPanel({ detail, onDone }: { detail: Detail; onDone: (message: string) => Promise<void> }) {
+export function ReviewPanel({
+  detail,
+  onDone,
+}: {
+  detail: Detail
+  onDone: (message: string) => Promise<void>
+}) {
   const { t } = useI18n()
   const version = detail.current_version
   const mutation = useReviewDecision()
-  const [checks, setChecks] = useState({ source_authenticity_checked: false, applicability_verified: false, ocr_text_verified: false })
+  const [checks, setChecks] = useState({
+    source_authenticity_checked: false,
+    applicability_verified: false,
+    ocr_text_verified: false,
+  })
   const [note, setNote] = useState('')
   const [exception, setException] = useState('')
   const [pending, setPending] = useState<'' | Decision>('')
@@ -52,7 +69,10 @@ export function ReviewPanel({ detail, onDone }: { detail: Detail; onDone: (messa
       })
       await onDone(
         decision === 'approve'
-          ? t('adminKnowledge.reviewApproved', { version: current.version_number, title })
+          ? t('adminKnowledge.reviewApproved', {
+              version: current.version_number,
+              title,
+            })
           : decision === 'return'
             ? t('adminKnowledge.reviewReturned', { title })
             : t('adminKnowledge.reviewRejected', { title }),
@@ -68,25 +88,58 @@ export function ReviewPanel({ detail, onDone }: { detail: Detail; onDone: (messa
   if (!reviewable && !returned) {
     return current.review.status === 'approved' ? (
       <Banner>
-        {t('adminKnowledge.approvedBy', { name: current.review.approved_by_name ?? t('adminKnowledge.aReviewer'), date: formatDate(current.review.approved_at, true) })}
-        {current.review.note ? ` — “${current.review.note}”` : ''}. {t('adminKnowledge.publicationStatus', { status: current.publication.status })}
+        {t('adminKnowledge.approvedBy', {
+          name:
+            current.review.approved_by_name ?? t('adminKnowledge.aReviewer'),
+          date: formatDate(current.review.approved_at, true),
+        })}
+        {current.review.note ? ` — “${current.review.note}”` : ''}.{' '}
+        {t('adminKnowledge.publicationStatus', {
+          status: current.publication.status,
+        })}
       </Banner>
     ) : null
   }
 
-  const spinner = <LoaderCircle size={16} className="animate-spin" aria-hidden />
+  const spinner = (
+    <LoaderCircle size={16} className="animate-spin" aria-hidden />
+  )
 
   return (
     <div className="rounded-2xl border border-moss-128 bg-ash-27 p-4">
-      <SectionLabel>{t('adminKnowledge.reviewVersion', { version: current.version_number })}</SectionLabel>
+      <SectionLabel>
+        {t('adminKnowledge.reviewVersion', { version: current.version_number })}
+      </SectionLabel>
+      {current.review.auto_approval?.status === 'needs_review' ? (
+        <Banner tone="warning" className="mt-3">
+          {t('adminKnowledge.autoApprovalStopped')}
+          <ul className="mt-1 list-disc pl-5">
+            {current.review.auto_approval.reasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        </Banner>
+      ) : null}
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         <CheckItem
           label={t('adminKnowledge.checkAuthenticity')}
           checked={checks.source_authenticity_checked}
-          onChange={(v) => setChecks({ ...checks, source_authenticity_checked: v })}
+          onChange={(v) =>
+            setChecks({ ...checks, source_authenticity_checked: v })
+          }
         />
-        <CheckItem label={t('adminKnowledge.checkApplicability')} checked={checks.applicability_verified} onChange={(v) => setChecks({ ...checks, applicability_verified: v })} />
-        {hasOcr ? <CheckItem label={t('adminKnowledge.checkOcr')} checked={checks.ocr_text_verified} onChange={(v) => setChecks({ ...checks, ocr_text_verified: v })} /> : null}
+        <CheckItem
+          label={t('adminKnowledge.checkApplicability')}
+          checked={checks.applicability_verified}
+          onChange={(v) => setChecks({ ...checks, applicability_verified: v })}
+        />
+        {hasOcr ? (
+          <CheckItem
+            label={t('adminKnowledge.checkOcr')}
+            checked={checks.ocr_text_verified}
+            onChange={(v) => setChecks({ ...checks, ocr_text_verified: v })}
+          />
+        ) : null}
       </div>
       {blocking.length > 0 ? (
         <ul className="mt-3 space-y-1">
@@ -107,7 +160,9 @@ export function ReviewPanel({ detail, onDone }: { detail: Detail; onDone: (messa
         className={`${inputClass} mt-3 h-auto py-3`}
       />
       <details className="mt-2 text-xs text-ash-573">
-        <summary className="cursor-pointer">{t('adminKnowledge.selfApprovalSummary')}</summary>
+        <summary className="cursor-pointer">
+          {t('adminKnowledge.selfApprovalSummary')}
+        </summary>
         <input
           value={exception}
           aria-label={t('adminKnowledge.selfApprovalPlaceholder')}
@@ -120,32 +175,68 @@ export function ReviewPanel({ detail, onDone }: { detail: Detail; onDone: (messa
         <ErrorNote>{error}</ErrorNote>
       </div>
       <div className="mt-3 flex flex-wrap justify-end gap-2">
-        <button type="button" className={secondaryButton} disabled={pending !== ''} onClick={() => void decide('reject')}>
-          {pending === 'reject' ? spinner : <XCircle size={16} aria-hidden />} {t('adminKnowledge.reject')}
+        <button
+          type="button"
+          className={secondaryButton}
+          disabled={pending !== ''}
+          onClick={() => void decide('reject')}
+        >
+          {pending === 'reject' ? spinner : <XCircle size={16} aria-hidden />}{' '}
+          {t('adminKnowledge.reject')}
         </button>
-        <button type="button" className={secondaryButton} disabled={pending !== ''} onClick={() => void decide('return')}>
-          {pending === 'return' ? spinner : <Undo2 size={16} aria-hidden />} {t('adminKnowledge.returnWithNote')}
+        <button
+          type="button"
+          className={secondaryButton}
+          disabled={pending !== ''}
+          onClick={() => void decide('return')}
+        >
+          {pending === 'return' ? spinner : <Undo2 size={16} aria-hidden />}{' '}
+          {t('adminKnowledge.returnWithNote')}
         </button>
         {reviewable ? (
           <button
             type="button"
             className={primaryButton}
-            disabled={pending !== '' || !checks.source_authenticity_checked || !checks.applicability_verified}
+            disabled={
+              pending !== '' ||
+              !checks.source_authenticity_checked ||
+              !checks.applicability_verified
+            }
             onClick={() => void decide('approve')}
           >
-            {pending === 'approve' ? spinner : <Check size={16} aria-hidden />} {t('adminKnowledge.approveVersion', { version: current.version_number })}
+            {pending === 'approve' ? spinner : <Check size={16} aria-hidden />}{' '}
+            {t('adminKnowledge.approveVersion', {
+              version: current.version_number,
+            })}
           </button>
         ) : null}
       </div>
-      {returned ? <p className="mt-2 text-xs text-ash-573">{t('adminKnowledge.returnedHelp')}</p> : null}
+      {returned ? (
+        <p className="mt-2 text-xs text-ash-573">
+          {t('adminKnowledge.returnedHelp')}
+        </p>
+      ) : null}
     </div>
   )
 }
 
-function CheckItem({ label, checked, onChange }: { label: string; checked: boolean; onChange: (next: boolean) => void }) {
+export function CheckItem({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string
+  checked: boolean
+  onChange: (next: boolean) => void
+}) {
   return (
     <label className="flex items-start gap-2 rounded-xl bg-surface px-3 py-2 text-xs ring-1 ring-sand-124">
-      <input type="checkbox" className="mt-0.5" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input
+        type="checkbox"
+        className="mt-0.5"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
       {label}
     </label>
   )

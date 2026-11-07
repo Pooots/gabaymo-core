@@ -9,6 +9,8 @@ export type AdminUser = {
   role: string
   role_name?: string
   permissions?: Array<string>
+  /** Administrator role: may approve their own uploads (recorded as an exception). */
+  can_self_approve?: boolean
   two_factor_enabled?: boolean
 }
 
@@ -41,11 +43,18 @@ export function loadAdminSession(): Promise<AdminUser | null> {
   return session.load()
 }
 
-export type AdminLoginResult = { user: AdminUser } | { two_factor_required: true }
+export type AdminLoginResult =
+  { user: AdminUser } | { two_factor_required: true }
 
 /** Step 1: password. Resolves `{two_factor_required: true}` when a code is needed next. */
-export async function loginAdmin(email: string, password: string): Promise<AdminLoginResult> {
-  const { data } = await adminApi.post<{ user?: AdminUser; two_factor_required?: boolean }>('/v1/admin/login', {
+export async function loginAdmin(
+  email: string,
+  password: string,
+): Promise<AdminLoginResult> {
+  const { data } = await adminApi.post<{
+    user?: AdminUser
+    two_factor_required?: boolean
+  }>('/v1/admin/login', {
     email,
     password,
   })
@@ -57,7 +66,10 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
 
 /** Step 2: a 6-digit authenticator code or a one-time recovery code. */
 export async function loginAdminTwoFactor(code: string) {
-  const { data } = await adminApi.post<{ user: AdminUser }>('/v1/admin/login/two-factor', { code })
+  const { data } = await adminApi.post<{ user: AdminUser }>(
+    '/v1/admin/login/two-factor',
+    { code },
+  )
   writeAdminUser(data.user)
   return data.user
 }
@@ -68,22 +80,34 @@ export async function refreshAdminUser() {
   return data.user
 }
 
-export type TwoFactorSetup = { secret: string; otpauth_url: string; recovery_codes: Array<string> }
+export type TwoFactorSetup = {
+  secret: string
+  otpauth_url: string
+  recovery_codes: Array<string>
+}
 
 /** Starts setup; takes effect only after confirmTwoFactor. */
 export async function enableTwoFactor() {
-  const { data } = await adminApi.post<TwoFactorSetup>('/v1/admin/me/two-factor')
+  const { data } = await adminApi.post<TwoFactorSetup>(
+    '/v1/admin/me/two-factor',
+  )
   return data
 }
 
 export async function confirmTwoFactor(code: string) {
-  const { data } = await adminApi.post<{ user: AdminUser }>('/v1/admin/me/two-factor/confirm', { code })
+  const { data } = await adminApi.post<{ user: AdminUser }>(
+    '/v1/admin/me/two-factor/confirm',
+    { code },
+  )
   writeAdminUser(data.user)
   return data.user
 }
 
 export async function disableTwoFactor(password: string) {
-  const { data } = await adminApi.delete<{ user: AdminUser }>('/v1/admin/me/two-factor', { data: { password } })
+  const { data } = await adminApi.delete<{ user: AdminUser }>(
+    '/v1/admin/me/two-factor',
+    { data: { password } },
+  )
   writeAdminUser(data.user)
   return data.user
 }
@@ -94,7 +118,10 @@ export async function changeAdminPassword(input: {
   password: string
   password_confirmation: string
 }) {
-  const { data } = await adminApi.put<{ user: AdminUser }>('/v1/admin/me/password', input)
+  const { data } = await adminApi.put<{ user: AdminUser }>(
+    '/v1/admin/me/password',
+    input,
+  )
   writeAdminUser(data.user)
   return data.user
 }

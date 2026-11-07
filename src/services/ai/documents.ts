@@ -37,11 +37,25 @@ export type DocumentRow = {
     page_count: number | null
     completeness: number | null
     warnings_count: number
+    auto_approval?: AutoApprovalState | null
   } | null
   tags?: Array<string>
   uploaded_by_name: string | null
   created_at: string | null
   updated_at: string | null
+}
+
+/** Upload-time "approve when ready": pending, approved, or stopped for a manual review. */
+export type AutoApprovalState = {
+  status: 'pending' | 'approved' | 'needs_review'
+  reasons: Array<string>
+  requested_by?: string | null
+}
+
+export type AutoApproveRequest = {
+  source_authenticity_checked: boolean
+  applicability_verified: boolean
+  reason?: string | null
 }
 
 export type RegionRow = {
@@ -136,6 +150,7 @@ export type VersionDetail = {
     approved_at: string | null
     metadata_revision: number
     fingerprint: string | null
+    auto_approval?: AutoApprovalState | null
     history?: Array<{
       decision: string
       note: string | null
@@ -312,10 +327,12 @@ export async function uploadDocument(
   file: File,
   metadata: DocumentMetadata,
   onProgress?: (percent: number) => void,
+  autoApprove?: AutoApproveRequest | null,
 ) {
   const form = new FormData()
   form.append('file', file)
   form.append('metadata', JSON.stringify(metadata))
+  if (autoApprove) form.append('auto_approve', JSON.stringify(autoApprove))
   const { data } = await adminApi.post<{ data: DocumentRow }>(
     `${ADMIN}/knowledge/documents`,
     form,
