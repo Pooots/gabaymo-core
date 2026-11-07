@@ -1,5 +1,10 @@
 import { Detail, Frame } from './settings/Frame'
-import { DataScreen, IssuanceAlertsToggle, MembershipScreen, SecurityScreen } from './settings/AccountScreens'
+import {
+  DataScreen,
+  IssuanceAlertsToggle,
+  MembershipScreen,
+  SecurityScreen,
+} from './settings/AccountScreens'
 import { MemoryScreen } from './settings/MemoryScreen'
 import { RemindersScreen } from './settings/Reminders'
 import { RegionForm } from './settings/RegionForm'
@@ -16,7 +21,11 @@ import { useI18n } from '@/i18n'
 export { AccountSettingsMenu } from './settings/SettingsMenu'
 export type { SettingId } from './settings/SettingsMenu'
 
-const HELP_LINES: Array<MessageKey> = ['settings.help1', 'settings.help2', 'settings.help3']
+const HELP_LINES: Array<MessageKey> = [
+  'settings.help1',
+  'settings.help2',
+  'settings.help3',
+]
 
 export function SettingsScreen({
   setting,
@@ -43,7 +52,12 @@ export function SettingsScreen({
 
   if (setting === 'usage') {
     return (
-      <Frame title={t('settings.usageTitle')} text={t('settings.usageText', { plan: member?.plan ?? t('account.freeTrial') })}>
+      <Frame
+        title={t('settings.usageTitle')}
+        text={t('settings.usageText', {
+          plan: member?.plan ?? t('account.freeTrial'),
+        })}
+      >
         <UsageScreen initial={usage} onUpgrade={onUpgrade} />
       </Frame>
     )
@@ -51,15 +65,25 @@ export function SettingsScreen({
 
   if (setting === 'membership') {
     return (
-      <Frame title={t('memberAccount.membershipTitle')} text={t('memberAccount.membershipText')}>
-        <MembershipScreen member={member} onRenew={onRenew} onUpgrade={onUpgrade} />
+      <Frame
+        title={t('memberAccount.membershipTitle')}
+        text={t('memberAccount.membershipText')}
+      >
+        <MembershipScreen
+          member={member}
+          onRenew={onRenew}
+          onUpgrade={onUpgrade}
+        />
       </Frame>
     )
   }
 
   if (setting === 'reminders') {
     return (
-      <Frame title={t('memberAccount.remindersTitle')} text={t('memberAccount.remindersText')}>
+      <Frame
+        title={t('memberAccount.remindersTitle')}
+        text={t('memberAccount.remindersText')}
+      >
         <RemindersScreen />
       </Frame>
     )
@@ -67,7 +91,10 @@ export function SettingsScreen({
 
   if (setting === 'security') {
     return (
-      <Frame title={t('memberAccount.securityTitle')} text={t('memberAccount.securityText')}>
+      <Frame
+        title={t('memberAccount.securityTitle')}
+        text={t('memberAccount.securityText')}
+      >
         <SecurityScreen />
       </Frame>
     )
@@ -75,7 +102,10 @@ export function SettingsScreen({
 
   if (setting === 'data') {
     return (
-      <Frame title={t('memberAccount.dataTitle')} text={t('memberAccount.dataText')}>
+      <Frame
+        title={t('memberAccount.dataTitle')}
+        text={t('memberAccount.dataText')}
+      >
         <DataScreen member={member} />
       </Frame>
     )
@@ -83,7 +113,10 @@ export function SettingsScreen({
 
   if (setting === 'profile') {
     return (
-      <Frame title={t('settings.profileTitle')} text={t('settings.profileText')}>
+      <Frame
+        title={t('settings.profileTitle')}
+        text={t('settings.profileText')}
+      >
         <dl className="divide-y divide-ash-59 rounded-3xl border border-line bg-surface">
           <Detail label={t('settings.fieldName')} value={member?.name} />
           <Detail label={t('settings.fieldEmail')} value={member?.email} />
@@ -97,7 +130,10 @@ export function SettingsScreen({
 
   if (setting === 'preferences') {
     return (
-      <Frame title={t('settings.preferencesTitle')} text={t('settings.preferencesText')}>
+      <Frame
+        title={t('settings.preferencesTitle')}
+        text={t('settings.preferencesText')}
+      >
         <div className="space-y-6 rounded-3xl border border-line bg-surface px-5 py-5">
           <LanguageSwitcher />
           <ThemeToggle />
@@ -128,7 +164,10 @@ export function SettingsScreen({
       <Frame title={t('settings.helpTitle')} text={t('settings.helpText')}>
         <ul className="space-y-3">
           {HELP_LINES.map((key) => (
-            <li key={key} className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm leading-relaxed">
+            <li
+              key={key}
+              className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm leading-relaxed"
+            >
               {t(key)}
             </li>
           ))}
@@ -138,7 +177,10 @@ export function SettingsScreen({
   }
 
   return (
-    <Frame title={t('settings.activityTitle')} text={t('settings.activityText')}>
+    <Frame
+      title={t('settings.activityTitle')}
+      text={t('settings.activityText')}
+    >
       {conversations.length === 0 ? (
         <p className="text-sm text-muted">{t('settings.activityEmpty')}</p>
       ) : (

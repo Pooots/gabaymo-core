@@ -7,9 +7,25 @@
     @slot;
   }
   @media (prefers-color-scheme: dark) {
-    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+    &:where(
+      :root:not([data-theme='light']),
+      :root:not([data-theme='light']) *
+    ) {
       @slot;
     }
+  }
+}
+
+/*
+ * The logo artwork has near-black lettering made for light backgrounds. Until a
+ * light-on-dark version exists, give it a soft pale backing in dark mode.
+ */
+img[src='/gabaymo-logo.png'] {
+  @variant dark {
+    box-sizing: border-box;
+    border-radius: 0.75rem;
+    background-color: #f6faf7;
+    padding: 0.2rem 0.45rem;
   }
 }
 
@@ -19,12 +35,7 @@
   --green: var(--c-brand-fg, var(--c-brand));
   --paper: var(--c-paper-bg, var(--c-paper));
   --serif: 'Fraunces', 'Iowan Old Style', Palatino, serif;
-  --sans:
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 html {
@@ -65,13 +76,29 @@ section[id] {
 
 .home-shell {
   background:
-    radial-gradient(900px 420px at 0% -10%, rgba(16, 122, 67, 0.08), transparent 60%),
-    radial-gradient(720px 380px at 100% 0%, rgba(16, 122, 67, 0.06), transparent 55%),
+    radial-gradient(
+      900px 420px at 0% -10%,
+      rgba(16, 122, 67, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      720px 380px at 100% 0%,
+      rgba(16, 122, 67, 0.06),
+      transparent 55%
+    ),
     var(--paper);
 }
 
 /* Visible keyboard focus on controls (mouse clicks are unaffected). */
-:where(a, button, summary, [role='button'], [role='menuitem'], [role='tab'], [tabindex]):focus-visible {
+:where(
+  a,
+  button,
+  summary,
+  [role='button'],
+  [role='menuitem'],
+  [role='tab'],
+  [tabindex]
+):focus-visible {
   outline: 2px solid var(--c-brand-line, var(--c-brand));
   outline-offset: 2px;
 }

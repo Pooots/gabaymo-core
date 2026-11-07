@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react'
 
 import type { MessageKey } from '@/i18n'
 import { LanguageSwitcher } from '@/components/preferences/LanguageSwitcher'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { useDismiss } from '@/hooks/useDismiss'
 import { useI18n } from '@/i18n'
 import { readMember } from '@/services/memberAuth'
@@ -45,15 +46,23 @@ export function SiteHeader() {
           <img src="/gabaymo-logo.png" alt="" className="h-12 w-auto sm:h-14" />
         </a>
 
-        <nav aria-label={t('home.navLabel')} className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 text-[14.5px] text-moss-735 lg:flex">
+        <nav
+          aria-label={t('home.navLabel')}
+          className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 text-[14.5px] xl:gap-7 text-moss-735 lg:flex"
+        >
           {links.map((link) => (
-            <a key={link.href} href={link.href} className="transition hover:text-brand">
+            <a
+              key={link.href}
+              href={link.href}
+              className="transition hover:text-brand"
+            >
               {t(link.label)}
             </a>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle compact />
           <LanguageSwitcher compact />
           {member ? (
             <Link to="/account" className="btn-primary">
@@ -61,7 +70,10 @@ export function SiteHeader() {
             </Link>
           ) : (
             <>
-              <Link to="/login" className="px-3 py-2 text-sm font-medium text-moss-835">
+              <Link
+                to="/login"
+                className="px-3 py-2 text-sm font-medium text-moss-835"
+              >
                 {t('home.logIn')}
               </Link>
               <Link to="/register" className="btn-primary">
@@ -72,6 +84,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle compact />
           <LanguageSwitcher compact />
           <button
             ref={toggleRef}
@@ -82,29 +95,54 @@ export function SiteHeader() {
             aria-controls="site-mobile-menu"
             onClick={() => setOpen((value) => !value)}
           >
-            {open ? <X size={18} aria-hidden /> : <Menu size={18} aria-hidden />}
+            {open ? (
+              <X size={18} aria-hidden />
+            ) : (
+              <Menu size={18} aria-hidden />
+            )}
           </button>
         </div>
       </div>
 
       {open ? (
-        <div ref={panelRef} id="site-mobile-menu" className="border-t border-moss-80 bg-surface px-5 py-4 lg:hidden">
+        <div
+          ref={panelRef}
+          id="site-mobile-menu"
+          className="border-t border-moss-80 bg-surface px-5 py-4 lg:hidden"
+        >
           <nav aria-label={t('home.navLabel')} className="flex flex-col gap-1">
             {links.map((link) => (
-              <a key={link.href} href={link.href} className="rounded-xl px-3 py-3 text-moss-835" onClick={() => setOpen(false)}>
+              <a
+                key={link.href}
+                href={link.href}
+                className="rounded-xl px-3 py-3 text-moss-835"
+                onClick={() => setOpen(false)}
+              >
                 {t(link.label)}
               </a>
             ))}
             {member ? (
-              <Link to="/account" className="btn-primary mt-2 justify-center" onClick={() => setOpen(false)}>
+              <Link
+                to="/account"
+                className="btn-primary mt-2 justify-center"
+                onClick={() => setOpen(false)}
+              >
                 {t('home.account')}
               </Link>
             ) : (
               <>
-                <Link to="/login" className="rounded-xl px-3 py-3 text-moss-835" onClick={() => setOpen(false)}>
+                <Link
+                  to="/login"
+                  className="rounded-xl px-3 py-3 text-moss-835"
+                  onClick={() => setOpen(false)}
+                >
                   {t('home.logIn')}
                 </Link>
-                <Link to="/register" className="btn-primary mt-2 justify-center" onClick={() => setOpen(false)}>
+                <Link
+                  to="/register"
+                  className="btn-primary mt-2 justify-center"
+                  onClick={() => setOpen(false)}
+                >
                   {t('home.getStartedCta')}
                 </Link>
               </>

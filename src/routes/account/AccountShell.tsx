@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import type { MessageKey } from '@/i18n'
 import { LanguageSwitcher } from '@/components/preferences/LanguageSwitcher'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { useI18n } from '@/i18n'
 
 const assurances: Array<{ icon: typeof Quote; label: MessageKey }> = [
@@ -44,12 +45,18 @@ export function AccountShell({
         <div className="pointer-events-none absolute -top-24 -left-16 h-72 w-72 rounded-full bg-moss-669/40 blur-3xl" />
         <div className="pointer-events-none absolute right-0 bottom-0 h-80 w-80 rounded-full bg-moss-886 blur-3xl" />
 
-        <Link to="/" className="relative inline-flex w-fit rounded-2xl bg-surface px-3 py-2" aria-label={t('auth.homeLink')}>
+        <Link
+          to="/"
+          className="relative inline-flex w-fit rounded-2xl bg-surface px-3 py-2"
+          aria-label={t('auth.homeLink')}
+        >
           <img src="/gabaymo-logo.png" alt="" className="h-11 w-auto" />
         </Link>
 
         <div className="relative mt-10 lg:mt-0">
-          <p className="text-[11px] font-semibold tracking-[0.22em] text-moss-275">{eyebrow}</p>
+          <p className="text-[11px] font-semibold tracking-[0.22em] text-moss-275">
+            {eyebrow}
+          </p>
           <h1
             className={
               fit
@@ -60,7 +67,9 @@ export function AccountShell({
             {t('auth.heroLine1')}{' '}
             <span className="italic text-moss-102">{t('auth.heroLine2')}</span>
           </h1>
-          <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-moss-127">{text}</p>
+          <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-moss-127">
+            {text}
+          </p>
 
           <article
             className={
@@ -69,9 +78,15 @@ export function AccountShell({
                 : 'mt-8 hidden max-w-md rounded-3xl border border-surface/10 bg-surface/10 p-5 backdrop-blur-sm lg:block'
             }
           >
-            <p className="text-[11px] font-semibold tracking-[0.16em] text-moss-275">{t('auth.sampleEyebrow')}</p>
-            <p className="mt-3 text-sm leading-relaxed text-white">{t('auth.sampleQuestion')}</p>
-            <p className="mt-3 text-sm leading-relaxed text-moss-127">{t('auth.sampleAnswer')}</p>
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-moss-275">
+              {t('auth.sampleEyebrow')}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-white">
+              {t('auth.sampleQuestion')}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-moss-127">
+              {t('auth.sampleAnswer')}
+            </p>
             <p className="mt-4 border-t border-surface/10 pt-3 text-xs text-moss-194">
               DepEd Order No. 13, s. 2016 · {t('auth.samplePage')}
             </p>
@@ -80,7 +95,10 @@ export function AccountShell({
 
         <ul className="relative mt-8 flex flex-wrap gap-x-5 gap-y-2 lg:mt-0">
           {assurances.map((item) => (
-            <li key={item.label} className="flex items-center gap-2 text-xs text-moss-127">
+            <li
+              key={item.label}
+              className="flex items-center gap-2 text-xs text-moss-127"
+            >
               <item.icon size={14} aria-hidden className="text-moss-275" />
               {t(item.label)}
             </li>
@@ -95,18 +113,34 @@ export function AccountShell({
             : 'flex items-center px-5 py-10 sm:px-10 lg:overflow-y-auto lg:px-16 lg:py-12'
         }
       >
-        <div className={fit ? 'mx-auto w-full max-w-[560px]' : 'mx-auto w-full max-w-[440px]'}>
+        <div
+          className={
+            fit
+              ? 'mx-auto w-full max-w-[560px]'
+              : 'mx-auto w-full max-w-[440px]'
+          }
+        >
           {fit ? (
-            <Link to="/" className="mb-4 inline-flex lg:hidden" aria-label={t('auth.homeLink')}>
+            <Link
+              to="/"
+              className="mb-4 inline-flex lg:hidden"
+              aria-label={t('auth.homeLink')}
+            >
               <img src="/gabaymo-logo.png" alt="" className="h-10 w-auto" />
             </Link>
           ) : null}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link to="/" className="inline-flex items-center gap-2 text-sm text-moss-571">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-moss-571"
+            >
               <ArrowLeft size={16} aria-hidden />
               {t('auth.backToSite')}
             </Link>
-            <LanguageSwitcher compact />
+            <span className="flex items-center gap-2">
+              <ThemeToggle compact />
+              <LanguageSwitcher compact />
+            </span>
           </div>
           <h2
             className={

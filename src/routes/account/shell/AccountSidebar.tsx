@@ -1,5 +1,12 @@
 import { useId, useRef, useState } from 'react'
-import { MessageSquareText, Settings, Sparkles, SquarePen, Ticket, X } from 'lucide-react'
+import {
+  MessageSquareText,
+  Settings,
+  Sparkles,
+  SquarePen,
+  Ticket,
+  X,
+} from 'lucide-react'
 import { AccountSettingsMenu } from '../settings/SettingsMenu'
 import { useMediaQuery } from './useMediaQuery'
 import type { UseQueryResult } from '@tanstack/react-query'
@@ -79,7 +86,13 @@ export function AccountSidebar({
 
   return (
     <>
-      {drawer && open ? <div aria-hidden className="fixed inset-0 z-20 bg-moss-861/30" onClick={onClose} /> : null}
+      {drawer && open ? (
+        <div
+          aria-hidden
+          className="fixed inset-0 z-20 bg-moss-861/30"
+          onClick={onClose}
+        />
+      ) : null}
       <aside
         ref={asideRef}
         id="account-sidebar"
@@ -93,11 +106,19 @@ export function AccountSidebar({
         }`}
       >
         <div className="flex items-center justify-between px-2">
-          <button type="button" onClick={() => onPanel('ask')} aria-label={t('account.home')}>
+          <button
+            type="button"
+            onClick={() => onPanel('ask')}
+            aria-label={t('account.home')}
+          >
             <img src="/gabaymo-logo.png" alt="" className="h-10 w-auto" />
           </button>
           {drawer ? (
-            <IconButton label={t('account.closeMenu')} className="grid h-8 w-8 place-items-center rounded-full text-muted" onClick={onClose}>
+            <IconButton
+              label={t('account.closeMenu')}
+              className="grid h-8 w-8 place-items-center rounded-full text-muted"
+              onClick={onClose}
+            >
               <X size={16} aria-hidden />
             </IconButton>
           ) : null}
@@ -113,15 +134,32 @@ export function AccountSidebar({
         </button>
 
         <nav className="mt-2 space-y-1" aria-label={t('account.sectionsLabel')}>
-          <NavButton icon={MessageSquareText} label={t('account.navAnswers')} active={panel === 'answers'} onClick={() => onPanel('answers')} />
-          <NavButton icon={Sparkles} label={t('account.navPlan')} active={panel === 'plan'} onClick={() => onPanel('plan')} />
+          <NavButton
+            icon={MessageSquareText}
+            label={t('account.navAnswers')}
+            active={panel === 'answers'}
+            onClick={() => onPanel('answers')}
+          />
+          <NavButton
+            icon={Sparkles}
+            label={t('account.navPlan')}
+            active={panel === 'plan'}
+            onClick={() => onPanel('plan')}
+          />
           {ticketsOpen ? (
-            <NavButton icon={Ticket} label={t('account.navTickets')} active={panel === 'tickets'} onClick={() => onPanel('tickets')} />
+            <NavButton
+              icon={Ticket}
+              label={t('account.navTickets')}
+              active={panel === 'tickets'}
+              onClick={() => onPanel('tickets')}
+            />
           ) : null}
         </nav>
 
         <div className="mt-6 min-h-0 flex-1 overflow-y-auto px-2">
-          <p className="text-[11px] font-semibold tracking-[0.16em] text-moss-433 uppercase">{t('account.recent')}</p>
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-moss-433 uppercase">
+            {t('account.recent')}
+          </p>
           {conversations.isPending ? (
             <div role="status" aria-busy="true" className="mt-3 space-y-2">
               <span className="sr-only">{t('account.loadingRecent')}</span>
@@ -139,7 +177,9 @@ export function AccountSidebar({
               onRetry={() => void conversations.refetch()}
             />
           ) : list.length === 0 ? (
-            <p className="mt-3 text-[13px] leading-relaxed text-moss-433">{t('account.recentEmpty')}</p>
+            <p className="mt-3 text-[13px] leading-relaxed text-moss-433">
+              {t('account.recentEmpty')}
+            </p>
           ) : (
             <ul className="mt-2 space-y-1">
               {list.map((conversation) => (
@@ -147,9 +187,13 @@ export function AccountSidebar({
                   <button
                     type="button"
                     onClick={() => onOpenConversation(conversation.id)}
-                    aria-current={active === conversation.id ? 'true' : undefined}
+                    aria-current={
+                      active === conversation.id ? 'true' : undefined
+                    }
                     className={`w-full truncate rounded-xl px-2.5 py-2 text-left text-[13px] ${
-                      active === conversation.id ? 'bg-moss-71 text-brand' : 'text-moss-731 hover:bg-ash-41'
+                      active === conversation.id
+                        ? 'bg-moss-71 text-brand'
+                        : 'text-moss-731 hover:bg-ash-41'
                     }`}
                   >
                     {conversation.title ?? t('ask.untitled')}
@@ -175,12 +219,19 @@ export function AccountSidebar({
             />
           ) : null}
           <div className="flex items-center gap-2 rounded-2xl px-2 py-2">
-            <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-white">
+            <span
+              aria-hidden
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-sm font-semibold text-white"
+            >
               {firstName.slice(0, 1).toUpperCase()}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium">{member?.name ?? t('account.yourAccount')}</span>
-              <span className="block truncate text-xs text-moss-555">{member?.plan ?? t('account.freeTrial')}</span>
+              <span className="block truncate text-sm font-medium">
+                {member?.name ?? t('account.yourAccount')}
+              </span>
+              <span className="block truncate text-xs text-moss-555">
+                {member?.plan ?? t('account.freeTrial')}
+              </span>
             </span>
             <button
               ref={triggerRef}
@@ -201,14 +252,26 @@ export function AccountSidebar({
   )
 }
 
-function NavButton({ icon: Icon, label, active, onClick }: { icon: LucideIcon; label: string; active: boolean; onClick: () => void }) {
+function NavButton({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: LucideIcon
+  label: string
+  active: boolean
+  onClick: () => void
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
       className={`flex h-10 w-full items-center gap-2 rounded-full px-3 text-sm ${
-        active ? 'bg-moss-71 font-medium text-brand' : 'text-moss-731 hover:bg-ash-41'
+        active
+          ? 'bg-moss-71 font-medium text-brand'
+          : 'text-moss-731 hover:bg-ash-41'
       }`}
     >
       <Icon size={16} aria-hidden />

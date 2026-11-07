@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import type { MessageKey } from '@/i18n'
 import { Banner } from '@/components/ui'
 import { LanguageSwitcher } from '@/components/preferences/LanguageSwitcher'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { useI18n } from '@/i18n'
 
 /** Date of the placeholder text below (update with the reviewed version). */
@@ -11,21 +12,41 @@ const UPDATED = '2026-11-07'
 
 type Section = { title: MessageKey; body: MessageKey }
 
-function LegalPage({ title, intro, sections }: { title: MessageKey; intro: MessageKey; sections: Array<Section> }) {
+function LegalPage({
+  title,
+  intro,
+  sections,
+}: {
+  title: MessageKey
+  intro: MessageKey
+  sections: Array<Section>
+}) {
   const { t, intl } = useI18n()
   return (
     <main className="min-h-dvh bg-honey-63 px-4 py-10 text-moss-861 sm:px-6">
       <article className="mx-auto max-w-2xl rounded-3xl border border-line bg-surface px-6 py-8 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-moss-571">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-moss-571"
+          >
             <ArrowLeft size={16} aria-hidden />
             {t('legal.backHome')}
           </Link>
-          <LanguageSwitcher compact />
+          <span className="flex items-center gap-2">
+            <ThemeToggle compact />
+            <LanguageSwitcher compact />
+          </span>
         </div>
-        <h1 className="serif mt-6 text-4xl font-medium tracking-[-0.03em]">{t(title)}</h1>
+        <h1 className="serif mt-6 text-4xl font-medium tracking-[-0.03em]">
+          {t(title)}
+        </h1>
         <p className="mt-2 text-xs text-moss-555">
-          {t('legal.updated', { date: new Date(UPDATED).toLocaleDateString(intl, { dateStyle: 'long' }) })}
+          {t('legal.updated', {
+            date: new Date(UPDATED).toLocaleDateString(intl, {
+              dateStyle: 'long',
+            }),
+          })}
         </p>
         <Banner tone="warning" className="mt-5">
           {t('legal.draftNotice')}
@@ -36,7 +57,9 @@ function LegalPage({ title, intro, sections }: { title: MessageKey; intro: Messa
             <h2 className="text-base font-semibold">
               {index + 1}. {t(section.title)}
             </h2>
-            <p className="mt-2 text-[15px] leading-relaxed text-moss-833">{t(section.body)}</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-moss-833">
+              {t(section.body)}
+            </p>
           </section>
         ))}
       </article>

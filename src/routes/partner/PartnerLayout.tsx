@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
 import { PartnerSidebar } from './layout/PartnerSidebar'
 import type { KeyboardEvent } from 'react'
@@ -7,6 +12,7 @@ import type { KeyboardEvent } from 'react'
 import type { AppNotification } from '@/services/notifications'
 import { IconButton } from '@/components/ui'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useI18n } from '@/i18n'
 import { usePartnerRealtime } from '@/queries/partner'
@@ -41,7 +47,10 @@ export function PartnerLayout() {
   function openNotification(notification: AppNotification) {
     const id = notification.data.ticket_id
     if (notification.type === 'ticket.message' && id) {
-      void navigate({ to: '/partner/accepted/$ticketId', params: { ticketId: String(id) } })
+      void navigate({
+        to: '/partner/accepted/$ticketId',
+        params: { ticketId: String(id) },
+      })
     } else {
       void navigate({ to: '/partner/tickets' })
     }
@@ -69,6 +78,7 @@ export function PartnerLayout() {
         <Link to="/partner" aria-label="GabayMo">
           <img src="/gabaymo-logo.png" alt="GabayMo" className="h-8 w-auto" />
         </Link>
+        <ThemeToggle compact className="ml-auto" />
       </header>
 
       <aside className="hidden w-[248px] shrink-0 flex-col border-r border-sand-127 bg-honey-49 px-3 py-5 lg:flex">
@@ -76,9 +86,16 @@ export function PartnerLayout() {
       </aside>
 
       {drawerOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden" onKeyDown={onDrawerKeyDown}>
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          onKeyDown={onDrawerKeyDown}
+        >
           {/* Backdrop: mouse/touch convenience; keyboard users have Escape and the close button. */}
-          <div aria-hidden className="absolute inset-0 bg-moss-898/40" onClick={() => setDrawerOpen(false)} />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-moss-898/40"
+            onClick={() => setDrawerOpen(false)}
+          />
           <div
             ref={drawer}
             id="partner-nav-drawer"

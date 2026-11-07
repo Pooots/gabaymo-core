@@ -29,6 +29,8 @@ export const common = {
   themeSystem: 'Match device',
   themeLight: 'Light',
   themeDark: 'Dark',
+  switchToDark: 'Switch to dark theme',
+  switchToLight: 'Switch to light theme',
   confirmDefaultTitle: 'Are you sure?',
   pagination: 'Pages',
   pageRange: '{from}–{to} of {total}',

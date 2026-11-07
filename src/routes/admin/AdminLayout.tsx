@@ -1,20 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
 
 import { AdminNav, adminModules, canOpen } from './AdminNav'
 import type { AdminUser } from '@/services/adminAuth'
 import { useDismiss } from '@/hooks/useDismiss'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { useI18n } from '@/i18n'
-import { loadAdminSession, logoutAdmin, readAdminUser } from '@/services/adminAuth'
+import {
+  loadAdminSession,
+  logoutAdmin,
+  readAdminUser,
+} from '@/services/adminAuth'
 
 const NAV_ID = 'admin-nav-panel'
 const DESKTOP_QUERY = '(min-width: 1024px)'
 
 /** True at the `lg` breakpoint, where the sidebar is always shown. */
 function useIsDesktop() {
-  const [desktop, setDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches)
+  const [desktop, setDesktop] = useState(
+    () =>
+      typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches,
+  )
   useEffect(() => {
     const media = window.matchMedia(DESKTOP_QUERY)
     const onChange = () => setDesktop(media.matches)
@@ -25,7 +38,9 @@ function useIsDesktop() {
 }
 
 function isCurrent(item: { to: string; exact?: boolean }, current: string) {
-  return item.exact ? current === item.to : current === item.to || current.startsWith(`${item.to}/`)
+  return item.exact
+    ? current === item.to
+    : current === item.to || current.startsWith(`${item.to}/`)
 }
 
 export function AdminLayout() {
@@ -54,7 +69,10 @@ export function AdminLayout() {
     if (!permissions) return
     const currentItem = adminModules.find((item) => isCurrent(item, current))
     if (!currentItem || canOpen(currentItem, permissions)) return
-    const next = adminModules.find((item) => item.keys.length > 0 && canOpen(item, permissions)) ?? adminModules.find((item) => canOpen(item, permissions))
+    const next =
+      adminModules.find(
+        (item) => item.keys.length > 0 && canOpen(item, permissions),
+      ) ?? adminModules.find((item) => canOpen(item, permissions))
     if (next) void navigate({ to: next.to })
   }, [admin, current, navigate])
 
@@ -76,7 +94,11 @@ export function AdminLayout() {
       >
         <div className="mb-5 flex items-center justify-between gap-2 px-2">
           <Link to="/" className="block" aria-label={t('admin.homeLink')}>
-            <img src="/gabaymo-logo.png" alt="GabayMo" className="h-10 w-auto" />
+            <img
+              src="/gabaymo-logo.png"
+              alt="GabayMo"
+              className="h-10 w-auto"
+            />
           </Link>
           {open ? (
             <button
@@ -93,16 +115,26 @@ export function AdminLayout() {
           ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <AdminNav current={current} permissions={admin?.permissions} onNavigate={() => setMenuOpen(false)} />
+          <AdminNav
+            current={current}
+            permissions={admin?.permissions}
+            onNavigate={() => setMenuOpen(false)}
+          />
         </div>
       </aside>
 
       {open ? (
         // Backdrop: mouse/touch convenience only; keyboard users have Escape and the close button.
-        <div aria-hidden className="fixed inset-0 z-20 bg-black/30 lg:hidden" onClick={() => setMenuOpen(false)} />
+        <div
+          aria-hidden
+          className="fixed inset-0 z-20 bg-black/30 lg:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
       ) : null}
 
-      <div className={`min-w-0 lg:pl-64 ${isOverview ? 'xl:h-dvh xl:overflow-hidden' : ''}`}>
+      <div
+        className={`min-w-0 lg:pl-64 ${isOverview ? 'xl:h-dvh xl:overflow-hidden' : ''}`}
+      >
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-3 border-b border-sand-86 bg-ash-44/90 px-4 backdrop-blur sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <button
@@ -114,12 +146,19 @@ export function AdminLayout() {
               aria-controls={NAV_ID}
               onClick={() => setMenuOpen((value) => !value)}
             >
-              {open ? <X size={18} aria-hidden /> : <Menu size={18} aria-hidden />}
+              {open ? (
+                <X size={18} aria-hidden />
+              ) : (
+                <Menu size={18} aria-hidden />
+              )}
             </button>
             <p className="truncate text-sm font-medium text-ash-773">{title}</p>
           </div>
           <div className="flex shrink-0 items-center gap-4">
-            <p className="hidden text-sm text-ash-573 sm:block">{admin?.email}</p>
+            <ThemeToggle compact />
+            <p className="hidden text-sm text-ash-573 sm:block">
+              {admin?.email}
+            </p>
             <button
               type="button"
               className="text-sm font-medium text-ash-890"

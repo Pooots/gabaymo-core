@@ -30,6 +30,8 @@ export const common: Record<keyof typeof en, string> = {
   themeSystem: 'Sundin ang device',
   themeLight: 'Maliwanag',
   themeDark: 'Madilim',
+  switchToDark: 'Gamitin ang madilim na itsura',
+  switchToLight: 'Gamitin ang maliwanag na itsura',
   confirmDefaultTitle: 'Sigurado ka ba?',
   pagination: 'Mga pahina',
   pageRange: '{from}–{to} sa {total}',

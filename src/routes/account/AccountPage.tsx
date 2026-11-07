@@ -22,6 +22,7 @@ import type { SettingId } from './settings/SettingsMenu'
 import { IconButton } from '@/components/ui'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { LanguageSwitcher } from '@/components/preferences/LanguageSwitcher'
+import { ThemeToggle } from '@/components/preferences/ThemeToggle'
 import { UsagePill } from '@/components/usage/UsageMeter'
 import { useI18n } from '@/i18n'
 import { memberKeys, useConversations, useMe } from '@/queries/member'
@@ -35,12 +36,24 @@ export function AccountPage() {
   const member = me.data ?? null
   const conversations = useConversations()
   const askFlow = useAsk()
-  const { active, setActive, pendingQuestion, asking, askError, setAskError, draft, setDraft } = askFlow
+  const {
+    active,
+    setActive,
+    pendingQuestion,
+    asking,
+    askError,
+    setAskError,
+    draft,
+    setDraft,
+  } = askFlow
   const [panel, setPanel] = useState<Panel>('ask')
   const [menuOpen, setMenuOpen] = useState(false)
   const [setting, setSetting] = useState<SettingId>('usage')
   // Ticket chat to open from a notification click (key re-triggers the same ticket).
-  const [ticketFocus, setTicketFocus] = useState<{ id: number; key: number } | null>(null)
+  const [ticketFocus, setTicketFocus] = useState<{
+    id: number
+    key: number
+  } | null>(null)
   // "Pay again" from the membership card: open the checkout of that plan.
   const [renewPlanId, setRenewPlanId] = useState<number | null>(null)
   // "Add reminder" from an answer.
@@ -53,7 +66,8 @@ export function AccountPage() {
   useEffect(() => {
     if (search.verified) {
       void navigate({ to: '/account', search: {}, replace: true })
-      if (search.verified === '1') void client.invalidateQueries({ queryKey: memberKeys.me() })
+      if (search.verified === '1')
+        void client.invalidateQueries({ queryKey: memberKeys.me() })
     }
   }, [search.verified, navigate, client])
 
@@ -106,11 +120,16 @@ export function AccountPage() {
     void askFlow.ask(draft)
   }
 
-  const first = member?.first_name?.trim() || member?.name.split(' ')[0] || t('account.there')
+  const first =
+    member?.first_name?.trim() ||
+    member?.name.split(' ')[0] ||
+    t('account.there')
   const usage = member?.usage ?? null
   const ticketsOpen = (member?.plan_price ?? 0) > 0
-  const activeTitle = conversations.data?.find((c) => c.id === active)?.title ?? null
-  const threadOpen = panel === 'ask' && (active !== null || pendingQuestion !== null)
+  const activeTitle =
+    conversations.data?.find((c) => c.id === active)?.title ?? null
+  const threadOpen =
+    panel === 'ask' && (active !== null || pendingQuestion !== null)
 
   return (
     <main className="flex h-dvh overflow-hidden bg-ash-41 text-moss-861">
@@ -145,6 +164,7 @@ export function AccountPage() {
             <Menu size={18} aria-hidden />
           </IconButton>
           <span className="ml-auto flex min-w-0 items-center gap-2">
+            <ThemeToggle compact />
             <span className="hidden sm:inline-flex">
               <LanguageSwitcher compact />
             </span>
@@ -160,21 +180,39 @@ export function AccountPage() {
         </header>
         <VerifyEmailBanner member={member} verified={verified} />
         {reminderSaved ? (
-          <p role="status" className="relative mx-4 mt-2 max-w-xl self-center rounded-2xl bg-surface/90 px-4 py-3 text-center text-sm text-moss-833 shadow-sm sm:mx-auto">
+          <p
+            role="status"
+            className="relative mx-4 mt-2 max-w-xl self-center rounded-2xl bg-surface/90 px-4 py-3 text-center text-sm text-moss-833 shadow-sm sm:mx-auto"
+          >
             {t('memberAccount.reminderSaved')}{' '}
-            <button type="button" className="font-medium text-brand underline" onClick={() => { setReminderSaved(false); openSetting('reminders') }}>
+            <button
+              type="button"
+              className="font-medium text-brand underline"
+              onClick={() => {
+                setReminderSaved(false)
+                openSetting('reminders')
+              }}
+            >
               {t('memberAccount.reminderView')}
             </button>
           </p>
         ) : null}
         {paymentMessage ? (
-          <p role="status" className="relative mx-4 mt-2 max-w-xl self-center rounded-2xl bg-surface/90 px-4 py-3 text-center text-sm text-moss-833 shadow-sm sm:mx-auto">
+          <p
+            role="status"
+            className="relative mx-4 mt-2 max-w-xl self-center rounded-2xl bg-surface/90 px-4 py-3 text-center text-sm text-moss-833 shadow-sm sm:mx-auto"
+          >
             {paymentMessage}
           </p>
         ) : null}
 
         {panel === 'plan' ? (
-          <PlanUpgrade key={renewPlanId ?? 'plans'} member={member} usage={usage} renewPlanId={renewPlanId} />
+          <PlanUpgrade
+            key={renewPlanId ?? 'plans'}
+            member={member}
+            usage={usage}
+            renewPlanId={renewPlanId}
+          />
         ) : panel === 'tickets' && ticketsOpen ? (
           <MemberTickets focus={ticketFocus} />
         ) : panel === 'settings' ? (
@@ -192,7 +230,10 @@ export function AccountPage() {
             onMember={(next) => client.setQueryData(memberKeys.me(), next)}
           />
         ) : panel === 'answers' ? (
-          <AnswersView onOpen={openConversation} onStart={() => openPanel('ask')} />
+          <AnswersView
+            onOpen={openConversation}
+            onStart={() => openPanel('ask')}
+          />
         ) : threadOpen ? (
           <Thread
             key={active ?? 'new'}
@@ -214,11 +255,23 @@ export function AccountPage() {
             }}
           />
         ) : (
-          <AskHome firstName={first} draft={draft} setDraft={setDraft} onSubmit={onSubmit} asking={asking} error={askError} />
+          <AskHome
+            firstName={first}
+            draft={draft}
+            setDraft={setDraft}
+            onSubmit={onSubmit}
+            asking={asking}
+            error={askError}
+          />
         )}
       </section>
       {reminderDraft ? (
-        <ReminderDialog reminder={null} draft={reminderDraft} onClose={() => setReminderDraft(null)} onSaved={() => setReminderSaved(true)} />
+        <ReminderDialog
+          reminder={null}
+          draft={reminderDraft}
+          onClose={() => setReminderDraft(null)}
+          onSaved={() => setReminderSaved(true)}
+        />
       ) : null}
     </main>
   )
