@@ -2,6 +2,18 @@ import type { common as en } from '../en/common'
 
 export const common: Record<keyof typeof en, string> = {
   appName: 'GabayMo',
+  pageTitleHome: 'GabayMo — Mga sagot sa patakaran ng DepEd na may sanggunian',
+  pageTitleLogin: 'Mag-log in',
+  pageTitleRegister: 'Gumawa ng account',
+  pageTitleForgotPassword: 'Nakalimutan ang password',
+  pageTitleResetPassword: 'Palitan ang password',
+  pageTitleSetupAccount: 'I-set up ang iyong account',
+  pageTitleTerms: 'Mga Tuntunin ng Serbisyo',
+  pageTitlePrivacy: 'Patakaran sa Privacy',
+  pageTitleAccount: 'Aking account',
+  pageTitleAdmin: 'Admin console',
+  pageTitlePartner: 'Partner portal',
+  pageTitleNotFound: 'Hindi makita ang page',
   retry: 'Subukan muli',
   loading: 'Naglo-load…',
   close: 'Isara',
@@ -15,9 +27,11 @@ export const common: Record<keyof typeof en, string> = {
   openMenu: 'Buksan ang menu',
   search: 'Maghanap',
   errorTitle: 'May nagkaproblema',
-  errorBody: 'Hindi namin ito ma-load. Paki-check ang internet mo at subukan muli.',
+  errorBody:
+    'Hindi namin ito ma-load. Paki-check ang internet mo at subukan muli.',
   offlineTitle: 'Offline ka ngayon',
-  offlineBody: 'Kumonekta muli sa internet para makita ang pinakabagong impormasyon.',
+  offlineBody:
+    'Kumonekta muli sa internet para makita ang pinakabagong impormasyon.',
   emptyTitle: 'Wala pang laman dito',
   notFoundTitle: 'Hindi makita ang page',
   notFoundBody: 'Wala na o inilipat na ang page na binuksan mo.',

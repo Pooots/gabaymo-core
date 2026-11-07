@@ -13,6 +13,7 @@ import {
 import { useI18n } from '@/i18n'
 import { useReviewDecision } from '@/queries/adminKnowledge'
 import { aiError, formatDate } from '@/services/ai'
+import { readAdminUser } from '@/services/adminAuth'
 
 type Decision = 'approve' | 'return' | 'reject'
 
@@ -34,6 +35,8 @@ export function ReviewPanel({
   })
   const [note, setNote] = useState('')
   const [exception, setException] = useState('')
+  // Administrators may approve their own uploads; the reason is optional.
+  const canSelfApprove = readAdminUser()?.can_self_approve === true
   const [pending, setPending] = useState<'' | Decision>('')
   const [error, setError] = useState('')
 
@@ -159,18 +162,20 @@ export function ReviewPanel({
         placeholder={t('adminKnowledge.reviewNotePlaceholder')}
         className={`${inputClass} mt-3 h-auto py-3`}
       />
-      <details className="mt-2 text-xs text-ash-573">
-        <summary className="cursor-pointer">
-          {t('adminKnowledge.selfApprovalSummary')}
-        </summary>
-        <input
-          value={exception}
-          aria-label={t('adminKnowledge.selfApprovalPlaceholder')}
-          onChange={(e) => setException(e.target.value)}
-          placeholder={t('adminKnowledge.selfApprovalPlaceholder')}
-          className={`${inputClass} mt-2 h-9`}
-        />
-      </details>
+      {canSelfApprove ? (
+        <details className="mt-2 text-xs text-ash-573">
+          <summary className="cursor-pointer">
+            {t('adminKnowledge.selfApprovalSummary')}
+          </summary>
+          <input
+            value={exception}
+            aria-label={t('adminKnowledge.selfApprovalPlaceholder')}
+            onChange={(e) => setException(e.target.value)}
+            placeholder={t('adminKnowledge.selfApprovalPlaceholder')}
+            className={`${inputClass} mt-2 h-9`}
+          />
+        </details>
+      ) : null}
       <div className="mt-2">
         <ErrorNote>{error}</ErrorNote>
       </div>

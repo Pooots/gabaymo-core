@@ -1,6 +1,18 @@
 /** Shared words and the shared UI (error/empty/loading states, dialogs, 404). */
 export const common = {
   appName: 'GabayMo',
+  pageTitleHome: 'GabayMo — Cited DepEd policy answers for school heads',
+  pageTitleLogin: 'Log in',
+  pageTitleRegister: 'Create your account',
+  pageTitleForgotPassword: 'Forgot password',
+  pageTitleResetPassword: 'Reset password',
+  pageTitleSetupAccount: 'Set up your account',
+  pageTitleTerms: 'Terms of Service',
+  pageTitlePrivacy: 'Privacy Policy',
+  pageTitleAccount: 'My account',
+  pageTitleAdmin: 'Admin console',
+  pageTitlePartner: 'Partner portal',
+  pageTitleNotFound: 'Page not found',
   retry: 'Try again',
   loading: 'Loading…',
   close: 'Close',

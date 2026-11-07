@@ -1,35 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/gabaymo-logo.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/icons/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/icons/icon-192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/icons/apple-touch-icon.png"
+    />
     <meta name="theme-color" content="#0e6b3e" />
     <meta name="color-scheme" content="light dark" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <script>
       // Apply the saved theme and language before first paint (no flash).
       try {
         var theme = localStorage.getItem('gabaymo_theme')
-        if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
-        if (localStorage.getItem('gabaymo_locale') === 'fil') document.documentElement.lang = 'fil'
+        if (theme === 'light' || theme === 'dark')
+          document.documentElement.setAttribute('data-theme', theme)
+        if (localStorage.getItem('gabaymo_locale') === 'fil')
+          document.documentElement.lang = 'fil'
       } catch (e) {}
     </script>
-    <meta name="title" content="GabayMo" />
+    <!-- Primary -->
+    <meta
+      name="title"
+      content="GabayMo — Cited DepEd policy answers for school heads"
+    />
     <meta
       name="description"
-      content="GabayMo is an AI policy companion for Philippine public school heads. Cited answers from DepEd orders, laws, and court decisions."
+      content="GabayMo is an AI policy companion for Philippine public school heads and teachers. Ask about MOOE, liquidation, procurement, workload and more, and get answers cited to the exact DepEd order, memorandum, law or court decision, with page references."
     />
+    <meta
+      name="keywords"
+      content="GabayMo, DepEd, DepEd orders, DepEd memorandum, MOOE, liquidation, school head, principal, public school, Philippines, policy assistant, procurement, teacher workload"
+    />
+    <meta name="author" content="GabayMo" />
+    <meta name="application-name" content="GabayMo" />
+    <meta name="apple-mobile-web-app-title" content="GabayMo" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href="%VITE_FRONTEND_URL%/" />
+    <link rel="alternate" hreflang="en-PH" href="%VITE_FRONTEND_URL%/" />
+    <link rel="alternate" hreflang="fil-PH" href="%VITE_FRONTEND_URL%/" />
+    <link rel="alternate" hreflang="x-default" href="%VITE_FRONTEND_URL%/" />
 
+    <!-- Open Graph (Facebook, Messenger, LinkedIn, Viber) -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GabayMo" />
     <meta property="og:url" content="%VITE_FRONTEND_URL%/" />
-    <meta property="og:title" content="GabayMo" />
+    <meta
+      property="og:title"
+      content="GabayMo — Know what the rule says, before you act"
+    />
     <meta
       property="og:description"
-      content="Know what the rule says, before you act. Cited DepEd policy answers with page-level references."
+      content="Cited DepEd policy answers for Philippine public school heads, with the exact order, page and provision attached."
     />
-    <meta property="og:site_name" content="GabayMo" />
+    <meta property="og:image" content="%VITE_FRONTEND_URL%/og-image.jpg" />
+    <meta
+      property="og:image:secure_url"
+      content="%VITE_FRONTEND_URL%/og-image.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="GabayMo logo: Know what the rule says, before you act."
+    />
     <meta property="og:locale" content="en_PH" />
+    <meta property="og:locale:alternate" content="fil_PH" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="GabayMo — Know what the rule says, before you act"
+    />
+    <meta
+      name="twitter:description"
+      content="Cited DepEd policy answers for Philippine public school heads, with the exact order, page and provision attached."
+    />
+    <meta name="twitter:image" content="%VITE_FRONTEND_URL%/og-image.jpg" />
+    <meta
+      name="twitter:image:alt"
+      content="GabayMo logo: Know what the rule says, before you act."
+    />
+
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "%VITE_FRONTEND_URL%/#organization",
+            "name": "GabayMo",
+            "url": "%VITE_FRONTEND_URL%/",
+            "logo": "%VITE_FRONTEND_URL%/gabaymo-logo.png",
+            "slogan": "Know what the rule says, before you act."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "%VITE_FRONTEND_URL%/#website",
+            "name": "GabayMo",
+            "url": "%VITE_FRONTEND_URL%/",
+            "inLanguage": ["en-PH", "fil-PH"],
+            "publisher": { "@id": "%VITE_FRONTEND_URL%/#organization" }
+          },
+          {
+            "@type": "WebApplication",
+            "name": "GabayMo",
+            "url": "%VITE_FRONTEND_URL%/",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "description": "AI policy companion for Philippine public school heads: answers cited to DepEd orders, memoranda, laws and court decisions.",
+            "publisher": { "@id": "%VITE_FRONTEND_URL%/#organization" }
+          }
+        ]
+      }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +138,8 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;0,9..144,650;1,9..144,560&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>%VITE_APP_TITLE%</title>
+    <!-- prettier-ignore -->
+    <title>%VITE_APP_TITLE% — Cited DepEd policy answers for school heads</title>
   </head>
   <body>
     <div id="app"></div>

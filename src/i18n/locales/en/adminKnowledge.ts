@@ -382,8 +382,8 @@ export const adminKnowledge = {
   reviewNoteLabel: 'Review note',
   reviewNotePlaceholder:
     'Review note (required to return or reject), e.g. “Page 3 extraction is incomplete.”',
-  selfApprovalSummary: 'I uploaded this document (self-approval exception)',
-  selfApprovalPlaceholder: 'Recorded justification (administrators only)',
+  selfApprovalSummary: 'Approving your own upload? Add a reason (optional)',
+  selfApprovalPlaceholder: 'Reason, recorded in the version history (optional)',
   reject: 'Reject',
   returnWithNote: 'Return with note',
   approveVersion: 'Approve version {version}',

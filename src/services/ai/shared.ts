@@ -41,10 +41,14 @@ export function aiError(
     const first = data?.errors
       ? Object.values(data.errors).flat()[0]
       : undefined
-    const reasons = data?.reasons?.length
-      ? ` (${data.reasons.map((r) => reasonText[r] ?? r.replace(/_/g, ' ')).join('; ')})`
-      : ''
-    return (first || data?.message || fallback) + (first ? '' : reasons)
+    const message = first || data?.message || fallback
+    // Skip reason texts that only repeat the message.
+    const extra = (data?.reasons ?? [])
+      .map((r) => reasonText[r] ?? r.replace(/_/g, ' '))
+      .filter((text) => !message.includes(text))
+    return (
+      message + (first || extra.length === 0 ? '' : ` (${extra.join('; ')})`)
+    )
   }
   return fallback
 }
