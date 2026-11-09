@@ -104,6 +104,13 @@ export type VersionDetail = {
       summary: string
       warnings: Array<string>
       needs_review: boolean
+      /** Number read from a scan or a handwritten/stamped blank; a reviewer must confirm it. */
+      document_number_check?: {
+        value: string
+        reason: 'handwritten' | 'scanned'
+        text_layer: string | null
+        image_reading: string | null
+      } | null
       ai_suggestion?: {
         scope: string
         applies_to_regions: Array<string>

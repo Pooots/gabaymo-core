@@ -172,7 +172,7 @@ export const adminKnowledge = {
     'Show machine extraction (corrected by {name}, rev. {revision})',
   reviewer: 'reviewer',
   legendRegion: 'region',
-  legendIssuance: 'issuance no.',
+  legendIssuance: 'document no.',
   legendDate: 'date',
   needsOcrBanner:
     'This page has no reliable text layer. GabayMo will not invent its text: re-extract with OCR, or type the text from the original page as a correction.',
@@ -206,6 +206,10 @@ export const adminKnowledge = {
     'This is a division memorandum, but its schools division could not be read from the letterhead. Set it by hand.',
   warnConflictingRegions: 'The letterhead names more than one region.',
   warnLowConfidence: 'The scope signals are weak. Check it by hand.',
+  warnNationalByDefault:
+    'No region was found in the letterhead, so it was set to National. Change it if the issuance is regional.',
+  warnFirstPageUnreadable:
+    'The first page has no readable text yet, so the region could not be read from the letterhead.',
   warnHistoricalRegion:
     'An old region name was found (e.g. “Region IV”). Pick the current region.',
   division: 'Division',
@@ -226,6 +230,9 @@ export const adminKnowledge = {
   scopeNational: 'National (all regions, minus exceptions)',
   scopeRegional: 'Regional (one or more regions)',
   scopeUnknown: 'Unknown — block publication',
+  scopeDivision: 'Schools division only',
+  divisionScopeHelp:
+    'Applies only to {divisions}. To cover the whole region, choose Regional.',
   nationalExceptions: 'Exceptions (regions the national rule does not cover)',
   verifiedAgainstIssuance: 'I verified this against the issuance',
   note: 'Note',
@@ -379,6 +386,10 @@ export const adminKnowledge = {
     'I checked this file against the official issuance (authenticity)',
   checkApplicability: 'Geographic applicability is correct (Regions tab)',
   checkOcr: 'OCR text matches the scanned pages',
+  checkNumberHandwritten:
+    'Document number "{number}" matches the original (it is handwritten or stamped, so it may be misread; fix it in Edit metadata if not)',
+  checkNumberScanned:
+    'Document number "{number}" matches the original (read from a scan; fix it in Edit metadata if not)',
   reviewNoteLabel: 'Review note',
   reviewNotePlaceholder:
     'Review note (required to return or reject), e.g. “Page 3 extraction is incomplete.”',

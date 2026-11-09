@@ -32,6 +32,7 @@ export function ReviewPanel({
     source_authenticity_checked: false,
     applicability_verified: false,
     ocr_text_verified: false,
+    document_number_verified: false,
   })
   const [note, setNote] = useState('')
   const [exception, setException] = useState('')
@@ -46,6 +47,15 @@ export function ReviewPanel({
   const returned = current.review.status === 'returned'
   const blocking = detail.readiness.filter((r) => r.blocking)
   const hasOcr = (current.processing.summary?.ocr_pages ?? 0) > 0
+  // A number read from a scan (often handwritten into "No. ____") stays a guess until checked.
+  const detectedNumber =
+    current.applicability.classification?.document_number_check
+  const numberCheck =
+    detectedNumber &&
+    (current.metadata.document_number ?? '').trim() ===
+      detectedNumber.value.trim()
+      ? detectedNumber
+      : null
   const title = detail.document.title
 
   async function decide(decision: Decision) {
@@ -141,6 +151,20 @@ export function ReviewPanel({
             label={t('adminKnowledge.checkOcr')}
             checked={checks.ocr_text_verified}
             onChange={(v) => setChecks({ ...checks, ocr_text_verified: v })}
+          />
+        ) : null}
+        {numberCheck ? (
+          <CheckItem
+            label={t(
+              numberCheck.reason === 'handwritten'
+                ? 'adminKnowledge.checkNumberHandwritten'
+                : 'adminKnowledge.checkNumberScanned',
+              { number: numberCheck.value },
+            )}
+            checked={checks.document_number_verified}
+            onChange={(v) =>
+              setChecks({ ...checks, document_number_verified: v })
+            }
           />
         ) : null}
       </div>

@@ -43,7 +43,9 @@ export function aiError(
       : undefined
     const message = first || data?.message || fallback
     // Skip reason texts that only repeat the message.
+    // Codes that carry an id ("duplicate_file:<uuid>") are for programs, not people.
     const extra = (data?.reasons ?? [])
+      .filter((r) => !r.includes(':'))
       .map((r) => reasonText[r] ?? r.replace(/_/g, ' '))
       .filter((text) => !message.includes(text))
     return (

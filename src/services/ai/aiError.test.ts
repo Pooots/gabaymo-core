@@ -24,4 +24,12 @@ describe('aiError', () => {
       'This version cannot be approved yet. (missing source url custom)',
     )
   })
+
+  it('hides reason codes that carry an id', () => {
+    const error = axiosError(409, {
+      message: 'This exact file is already in the library.',
+      reasons: ['duplicate_file:01a1beb9-0a3a-703a-8453-73b51bcdc7fd'],
+    })
+    expect(aiError(error)).toBe('This exact file is already in the library.')
+  })
 })
